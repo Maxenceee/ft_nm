@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 23:52:13 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 00:19:24 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,9 +102,14 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 			if (sym.st_shndx != SHN_UNDEF)
 				continue;
 		}
-		if (level & F_EXTO)
+		else if (level & F_EXTO)
 		{
 			if (bind != STB_GLOBAL && bind != STB_WEAK && bind != STB_LOOS && bind != STB_HIOS)
+				continue;
+		}
+		else if (!(level & F_ALL))
+		{
+			if (stype == STT_SECTION || stype == STT_FILE)
 				continue;
 		}
 
@@ -147,9 +152,14 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 			if (sym.st_shndx != SHN_UNDEF)
 				continue;
 		}
-		if (level & F_EXTO)
+		else if (level & F_EXTO)
 		{
 			if (bind != STB_GLOBAL && bind != STB_WEAK && bind != STB_LOOS && bind != STB_HIOS)
+				continue;
+		}
+		else if (!(level & F_ALL))
+		{
+			if (stype == STT_SECTION || stype == STT_FILE)
 				continue;
 		}
 
