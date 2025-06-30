@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:36:24 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 20:57:49 by mgama            ###   ########.fr       */
+/*   Updated: 2025/06/30 22:32:39 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,5 +106,5 @@ main(int ac, char** av)
 		print_elf_file(elf_file, PELF_SECTION | PELF_PROG | PELF_SYM);
 		printf("\n\n");
 	}
-	print_sym(elf_file);
+	print_sym(elf_file, option);
 }
