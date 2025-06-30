@@ -1,0 +1,10 @@
+.vscode
+.objs
+ft_nm
+tests*
+test.*
+test/*
+*.dSYM
+.DS_Store
+out*
+target.*
