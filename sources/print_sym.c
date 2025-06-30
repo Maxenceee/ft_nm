@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 23:02:31 by mgama            ###   ########.fr       */
+/*   Updated: 2025/06/30 23:52:13 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,12 +87,6 @@ get_elf_sym_type(t_elf_sym *sym, t_elf_section *all_sections)
 static nm_sym_t*
 print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_section *all_sections, int level)
 {
-	if (sym_section->sh_size == 0 || sym_section->sh_type == SHT_NOBITS)
-	{
-		printf("\nSymbol table '%s' contains no entries.\n", ".symtab");
-		return (NULL);
-	}
-
 	size_t container_size = 0;
 
 	t_elf_sym sym;
@@ -101,6 +95,18 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 		ft_memmove(&sym, absoffset, sizeof(sym));
 
 		uint8_t stype = ELF64_ST_TYPE(sym.st_info);
+		uint8_t bind = ELF64_ST_BIND(sym.st_info);
+
+		if (level & F_UNDO)
+		{
+			if (sym.st_shndx != SHN_UNDEF)
+				continue;
+		}
+		if (level & F_EXTO)
+		{
+			if (bind != STB_GLOBAL && bind != STB_WEAK && bind != STB_LOOS && bind != STB_HIOS)
+				continue;
+		}
 
 		char* name;
 		if (stype == STT_SECTION)
@@ -136,6 +142,17 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 		uint8_t stype = ELF64_ST_TYPE(sym.st_info);
 		uint8_t bind = ELF64_ST_BIND(sym.st_info);
 
+		if (level & F_UNDO)
+		{
+			if (sym.st_shndx != SHN_UNDEF)
+				continue;
+		}
+		if (level & F_EXTO)
+		{
+			if (bind != STB_GLOBAL && bind != STB_WEAK && bind != STB_LOOS && bind != STB_HIOS)
+				continue;
+		}
+
 		char* name;
 		if (stype == STT_SECTION)
 		{
@@ -155,6 +172,7 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 
 		rows[idx].name = name;
 		rows[idx].has_ndx = sym.st_shndx != 0;
+		rows[idx].st_info = sym.st_info;
 		rows[idx].value = sym.st_value;
 		rows[idx].type = type;
 
@@ -164,7 +182,7 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 	return (rows);
 }
 
-void
+int
 print_sym(t_elf_file *elf_file, int level)
 {
 	int symtab_idx = 0;
@@ -177,9 +195,16 @@ print_sym(t_elf_file *elf_file, int level)
 			symstr_idx = i;
 	}
 
+	if (elf_file->section_tables[symtab_idx].sh_size == 0 || elf_file->section_tables[symtab_idx].sh_type == SHT_NOBITS)
+	{
+		return (2);
+	}
+
 	nm_sym_t* rows = print_elf_sym(&elf_file->section_tables[symtab_idx], &elf_file->section_tables[symstr_idx], elf_file->section_tables, level);
 	if (!rows)
-		return;
+	{
+		return (1);
+	}
 
 	for (nm_sym_t* row = rows; row->name != NULL; row++)
 	{
@@ -195,4 +220,5 @@ print_sym(t_elf_file *elf_file, int level)
 		else
 			ft_verbose("%s\n", row->name);
 	}
+	return (0);
 }

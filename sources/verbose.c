@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 21:42:23 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 23:08:01 by mgama            ###   ########.fr       */
+/*   Updated: 2025/06/30 23:37:23 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ typedef struct s_format_opts
 
 int	verbose_mode = VERBOSE_OFF;
 int verbose_size = 0;
+int verbose_color = VERBOSE_COLOR_ON;
 
 inline static void
 ft_putchar_fd(int fd, char c)
@@ -255,23 +256,28 @@ ft_switch_types(int fd, const char *fmt, va_list *argp, t_format_opts *opts)
 		break;
 	case 'd':
 	case 'i':
-		ft_putstr_fd(fd, B_YELLOW);
+		if (verbose_color)
+			ft_putstr_fd(fd, B_YELLOW);
 		if (opts->width > 0)
 			ft_putnbr_padded(fd, va_arg(*argp, long), opts->width, opts->zero_pad);
 		else
 			ft_putnbr(fd, va_arg(*argp, long));
-		ft_putstr_fd(fd, RESET);
+		if (verbose_color)
+			ft_putstr_fd(fd, RESET);
 		break;
 	case 'u':
-		ft_putstr_fd(fd, B_YELLOW);
+		if (verbose_color)
+			ft_putstr_fd(fd, B_YELLOW);
 		if (opts->width > 0)
 			ft_putnbr_base_padded(fd, va_arg(*argp, unsigned long), 0, 10, opts->width, opts->zero_pad);
 		else
 			ft_putnbr_base(fd, va_arg(*argp, unsigned long), 0, 10);
-		ft_putstr_fd(fd, RESET);
+		if (verbose_color)
+			ft_putstr_fd(fd, RESET);
 		break;
 	case 'x':
-		ft_putstr_fd(fd, B_PINK);
+		if (verbose_color)
+			ft_putstr_fd(fd, B_PINK);
 		if (opts->hex)
 			ft_putstr_fd(fd, "0x");
 		if (opts->is_long_long)
@@ -288,10 +294,12 @@ ft_switch_types(int fd, const char *fmt, va_list *argp, t_format_opts *opts)
 			else
 				ft_putnbr_base(fd, va_arg(*argp, uint32_t), 0, 16);
 		}
-		ft_putstr_fd(fd, RESET);
+		if (verbose_color)
+			ft_putstr_fd(fd, RESET);
 		break;
 	case 'X':
-		ft_putstr_fd(fd, B_PINK);
+		if (verbose_color)
+			ft_putstr_fd(fd, B_PINK);
 		if (opts->hex)
 			ft_putstr_fd(fd, "0x");
 		if (opts->is_long_long)
@@ -308,12 +316,15 @@ ft_switch_types(int fd, const char *fmt, va_list *argp, t_format_opts *opts)
 			else
 				ft_putnbr_base(fd, va_arg(*argp, uint32_t), 16, 16);
 		}
-		ft_putstr_fd(fd, RESET);
+		if (verbose_color)
+			ft_putstr_fd(fd, RESET);
 		break;
 	case 'p':
-		ft_putstr_fd(fd, B_PINK);
+		if (verbose_color)
+			ft_putstr_fd(fd, B_PINK);
 		ft_puthex_p(fd, va_arg(*argp, unsigned long int));
-		ft_putstr_fd(fd, RESET);
+		if (verbose_color)
+			ft_putstr_fd(fd, RESET);
 		break;
 	}
 }

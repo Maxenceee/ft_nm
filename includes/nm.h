@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:38:16 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 22:43:11 by mgama            ###   ########.fr       */
+/*   Updated: 2025/06/30 23:41:18 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,15 @@
 #define F_RSRT		0x08
 #define F_NSRT		0x10
 
-void	print_sym(t_elf_file *elf_file, int level);
+int		print_sym(t_elf_file *elf_file, int level);
 
 typedef struct nm_sym_s
 {
-	char			*name;		// Symbol name
-	uint8_t			has_ndx;	// Section index
-	uint64_t		value;		// Symbol value
-	char			type;		// Symbol type (e.g., 'T', 'D', 'B', etc.)
+	char			*name;
+	uint8_t			has_ndx;
+	uint8_t			st_info;
+	uint64_t		value;
+	char			type;
 }	nm_sym_t;
 
 

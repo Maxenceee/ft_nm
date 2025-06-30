@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:36:24 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 23:02:51 by mgama            ###   ########.fr       */
+/*   Updated: 2025/06/30 23:46:36 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,8 @@ main(int ac, char** av)
 		usage();
 	target = av[options.optind];
 
+	verbose_mode = VERBOSE_ON;
+
 	int fd = open(target, O_RDONLY);
 	if (fd == -1)
 	{
@@ -94,9 +96,12 @@ main(int ac, char** av)
 		return (1);
 	}
 
+	verbose_mode = VERBOSE_OFF;
 	t_elf_file *elf_file = new_elf_file(reader);
+	verbose_mode = VERBOSE_ON;
 	if (elf_file == NULL)
 	{
+		ft_error("The file was not recognized as a valid object file");
 		delete_binary_reader(reader);
 		return (1);
 	}
@@ -106,7 +111,15 @@ main(int ac, char** av)
 		print_elf_file(elf_file, PELF_SECTION | PELF_PROG | PELF_SYM);
 		printf("\n\n");
 	}
+	verbose_color = VERBOSE_COLOR_OFF;
 
-	verbose_mode = VERBOSE_ON;
-	print_sym(elf_file, option);
+	switch (print_sym(elf_file, option))
+	{
+	case 2:
+		ft_dverbose(STDERR_FILENO, "%s: no symbols", target);
+		break;
+	case 1:
+		return (1);
+	}
+	return (0);
 }
