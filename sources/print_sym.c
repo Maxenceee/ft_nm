@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 22:51:57 by mgama            ###   ########.fr       */
+/*   Updated: 2025/06/30 23:02:31 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,15 +184,15 @@ print_sym(t_elf_file *elf_file, int level)
 	for (nm_sym_t* row = rows; row->name != NULL; row++)
 	{
 		if (row->has_ndx)
-			printf("%016"PELF_llx" ", row->value);
+			ft_verbose("%016lx ", row->value);
 		else
-			printf("                  ");
+			ft_verbose("                 ");
 
-		printf("%c ", row->type);
+		ft_verbose("%c ", row->type);
 
 		if (row->has_ndx)
-			printf("%s\n", row->name);
+			ft_verbose("%s\n", row->name);
 		else
-			printf("%s\n", row->name);
+			ft_verbose("%s\n", row->name);
 	}
 }
