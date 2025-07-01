@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 13:07:47 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 13:08:32 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,29 +50,32 @@ int type_rank(char type) {
 }
 
 static int strcmp_case_insensitive(const char *a, const char *b) {
-	if (((a >= 'A' && a <= 'Z') || (a >= 'a' && a <= 'z')) &&
-        ((b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z'))) {
-        
-        char lower_a = (a >= 'A' && a <= 'Z') ? (a + 32) : a;
-        char lower_b = (b >= 'A' && b <= 'Z') ? (b + 32) : b;
-        
-        if (lower_a != lower_b) {
-            // Différence alphabétique (insensible à la casse)
-            return (lower_a < lower_b) ? -1 : 1;
-        } else {
-            // Même lettre, départage selon la casse
-            if (a != b)
-                return (a < b) ? -1 : 1; // majuscule avant minuscule car ASCII majuscule < minuscule
-            else
-                return 0;
-        }
-    } else {
-        // Sinon comparer selon ASCII classique
-        if (a != b)
-            return (a < b) ? -1 : 1;
-        else
-            return 0;
-    }
+	char ca = *a;
+	char cb = *b;
+
+	if (((ca >= 'A' && ca <= 'Z') || (ca >= 'a' && ca <= 'z')) &&
+		((cb >= 'A' && cb <= 'Z') || (cb >= 'a' && cb <= 'z'))) {
+
+		char lower_a = (ca >= 'A' && ca <= 'Z') ? (ca + 32) : ca;
+		char lower_b = (cb >= 'A' && cb <= 'Z') ? (cb + 32) : cb;
+
+		if (lower_a != lower_b) {
+			// Différence alphabétique (insensible à la casse)
+			return (lower_a < lower_b) ? -1 : 1;
+		} else {
+			// Même lettre, départage selon la casse
+			if (ca != cb)
+				return (ca < cb) ? -1 : 1; // majuscule avant minuscule car ASCII majuscule < minuscule
+			else
+				return 0;
+		}
+	} else {
+		// Sinon comparer selon ASCII classique
+		if (ca != cb)
+			return (ca < cb) ? -1 : 1;
+		else
+			return 0;
+	}
 }
 
 static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
