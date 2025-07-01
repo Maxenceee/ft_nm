@@ -3,7 +3,9 @@
 ft_nm
 tests*
 test.*
-test/*
+test_*
+test/
+test_res/
 *.dSYM
 .DS_Store
 out*

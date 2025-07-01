@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 13:27:51 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 14:56:42 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,59 +25,69 @@ free_nodes(nm_sym_node_t *node)
 	}
 }
 
-static const char* skip_prefix(const char* s) {
-	while (*s == '_' || *s == '*') {
-		s++;
-	}
-	return s;
-}
-
 int type_rank(char type) {
-    switch(type) {
-        case 'U': return 7;  // undefined
-        case 'w': return 6;  // weak object
-        case 'W': return 5;  // weak object (strong)
-        case 'B': return 4;  // bss
-        case 'D': return 3;  // data
-        case 'R': return 2;  // read only data
-        case 'T': return 1;  // text (code)
-        case 't': return 1;  // text (local)
-        case 'd': return 3;  // data (local)
-        case 'b': return 4;  // bss (local)
-        // ajoute d'autres types selon besoin
-        default:  return 8;  // autres types moins prioritaires
-    }
+	switch(type) {
+		case 'U': return 7;  // undefined
+		case 'w': return 6;  // weak object
+		case 'W': return 5;  // weak object (strong)
+		case 'B': return 4;  // bss
+		case 'D': return 3;  // data
+		case 'R': return 2;  // read only data
+		case 'T': return 1;  // text (code)
+		case 't': return 1;  // text (local)
+		case 'd': return 3;  // data (local)
+		case 'b': return 4;  // bss (local)
+		// ajoute d'autres types selon besoin
+		default:  return 8;  // autres types moins prioritaires
+	}
 }
 
-static int strcmp_case(const char *a, const char *b) {
-	while (*a && *b) {
-		char ca = ft_tolower((unsigned char)*a);
-		char cb = ft_tolower((unsigned char)*b);
-		if (ca != cb)
-			return (ca < cb) ? -1 : 1;
-		a++;
-		b++;
-	}
-	if (*a) return 1;
-	if (*b) return -1;
-	return 0;
+void
+build_full_name(char *dest, size_t dest_size, char *name, char *version)
+{
+	 size_t i = 0;
+    size_t j = 0;
+
+    // Copie name dans dest
+    while (name[i] && i + 1 < dest_size) {
+        dest[i] = name[i];
+        i++;
+    }
+
+    // Si version existe et il reste de la place, ajoute '@'
+    if (version && i + 1 < dest_size) {
+        dest[i] = '@';
+        i++;
+    }
+
+    // Copie version dans dest après '@'
+    if (version) {
+        while (version[j] && i + 1 < dest_size) {
+            dest[i] = version[j];
+            i++;
+            j++;
+        }
+    }
+
+    // Termine toujours par un '\0'
+    if (dest_size > 0)
+        dest[i] = '\0';
 }
 
 static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
 {
-	const char *name_a = skip_prefix(a->name);
-	const char *name_b = skip_prefix(b->name);
+	// Construire les chaînes complètes nom@version pour la comparaison
+	char full_name_a[1024];
+	char full_name_b[1024];
 
-	int res = strcmp_case(name_a, name_b);
+	build_full_name(full_name_a, sizeof(full_name_a), a->name, a->version);
+	build_full_name(full_name_b, sizeof(full_name_b), b->name, b->version);
+
+	int res = strcmp(full_name_a, full_name_b);
 
 	if (res == 0) {
-		int rank_a = type_rank(a->type);
-		int rank_b = type_rank(b->type);
-		if (rank_a != rank_b)
-			return (rank_a < rank_b) ? -1 : 1;
-		if (a->value != b->value)
-			return (a->value < b->value) ? -1 : 1;
-		return 0;
+		// Si les noms sont identiques, trier par adresse
+		return (a->value < b->value) ? -1 : 1;
 	}
 	if (level & F_RSRT)
 		return -res;
