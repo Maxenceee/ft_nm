@@ -6,11 +6,108 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 12:23:02 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 12:46:04 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nm.h"
+
+void
+free_nodes(nm_sym_node_t *node)
+{
+	nm_sym_node_t *next;
+
+	while (node)
+	{
+		next = node->next;
+		free(node);
+		node = next;
+	}
+}
+
+static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
+{
+	if (!a->name || !b->name)
+		return 0;
+
+	int res = strcmp(a->name, b->name);
+	if (res == 0) {
+		// Tri secondaire par valeur (adresse)
+		if (a->value < b->value)
+			res = -1;
+		else if (a->value > b->value)
+			res = 1;
+		else
+			res = 0;
+	}
+
+	if (level & F_RSRT)
+		return -res; // ordre inverse
+	return res; // ordre normal
+
+}
+
+static nm_sym_node_t *merge_sorted_lists(nm_sym_node_t *a, nm_sym_node_t *b, int level)
+{
+	if (!a) return b;
+	if (!b) return a;
+
+	nm_sym_node_t *result = NULL;
+
+	if (cmp_sym(a, b, level) <= 0) {
+		result = a;
+		result->next = merge_sorted_lists(a->next, b, level);
+	} else {
+		result = b;
+		result->next = merge_sorted_lists(a, b->next, level);
+	}
+	return result;
+}
+
+static void split_list(nm_sym_node_t *source, nm_sym_node_t **front, nm_sym_node_t **back)
+{
+	nm_sym_node_t *slow = source;
+	nm_sym_node_t *fast = source->next;
+
+	while (fast) {
+		fast = fast->next;
+		if (fast) {
+			slow = slow->next;
+			fast = fast->next;
+		}
+	}
+	*front = source;
+	*back = slow->next;
+	slow->next = NULL;
+}
+
+static nm_sym_node_t *merge_sort(nm_sym_node_t *head, int level)
+{
+	if (!head || !head->next)
+		return head;
+
+	nm_sym_node_t *left = NULL;
+	nm_sym_node_t *right = NULL;
+
+	split_list(head, &left, &right);
+
+	left = merge_sort(left, level);
+	right = merge_sort(right, level);
+
+	return merge_sorted_lists(left, right, level);
+}
+
+void
+sort_nodes(nm_sym_node_t **head, int level)
+{
+	if (level & F_NSRT)
+		return;
+
+	if (!head || !*head || (level & F_NSRT))
+		return;
+
+	*head = merge_sort(*head, level);
+}
 
 static char
 format_on_linkage_scope(char base, int global)
@@ -110,10 +207,9 @@ get_version_name(uint16_t ndx, t_elf_section *verneed_section, char *verstrtab)
 	return NULL;
 }
 
-static nm_sym_t*
+static nm_sym_node_t*
 print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_section *all_sections, int level)
 {
-	size_t container_size = 0;
 	uint16_t *versym = NULL;
 	t_elf_section *verneed_section = NULL;
 	char *verstrtab = NULL;
@@ -135,55 +231,8 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 	}
 
 	t_elf_sym sym;
-	for (size_t j = 0; j * sizeof(t_elf_sym) < sym_section->sh_size; j++) {
-		void *absoffset = sym_section->data + j * sizeof(t_elf_sym);
-		ft_memmove(&sym, absoffset, sizeof(sym));
-
-		uint8_t stype = ELF64_ST_TYPE(sym.st_info);
-		uint8_t bind = ELF64_ST_BIND(sym.st_info);
-
-		if (level & F_UNDO)
-		{
-			if (sym.st_shndx != SHN_UNDEF)
-				continue;
-		}
-		else if (level & F_EXTO)
-		{
-			if (bind != STB_GLOBAL && bind != STB_WEAK && bind != STB_LOOS && bind != STB_HIOS)
-				continue;
-		}
-		else if (!(level & F_ALL))
-		{
-			if (stype == STT_SECTION || stype == STT_FILE)
-				continue;
-		}
-
-		char* name;
-		if (stype == STT_SECTION)
-		{
-			name = all_sections[sym.st_shndx].sh_name;
-		}
-		else
-		{
-			name = (char *)symstr_section->data + sym.st_name;
-		}
-		if (!name || !*name) {
-			// Ignore symboles sans nom sauf si c'est un STT_FILE (tu peux ajouter ce test)
-			if (stype != STT_FILE)
-				continue;
-		}
-
-		container_size++;
-	}
-
-	size_t idx = 0;
-	nm_sym_t* rows = malloc(sizeof(nm_sym_t) * (container_size + 1));
-	if (!rows)
-	{
-		ft_dverbose(STDERR_FILENO, NM_PREFIX"Could not allocate memory for symbol table\n");
-		return (NULL);
-	}
-	ft_bzero(rows, sizeof(nm_sym_t) * (container_size + 1));
+	nm_sym_node_t* first_node = NULL;
+	nm_sym_node_t* last_node = NULL;
 
 	for (size_t j = 0; j * sizeof(t_elf_sym) < sym_section->sh_size; j++) {
 		void *absoffset = sym_section->data + j * sizeof(t_elf_sym);
@@ -225,22 +274,34 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 
 		char type = get_elf_sym_type(&sym, all_sections);
 
-		rows[idx].name = name;
-		rows[idx].version = NULL;
-		rows[idx].has_ndx = sym.st_shndx != 0;
-		rows[idx].st_info = sym.st_info;
-		rows[idx].value = sym.st_value;
-		rows[idx].type = type;
+		nm_sym_node_t* node = malloc(sizeof(nm_sym_node_t));
+		if (!node)
+		{
+			free_nodes(first_node);
+			return (NULL);
+		}
+
+		if (first_node == NULL) {
+			first_node = node;
+		} else {
+			last_node->next = node;
+		}
+		last_node = node;
+
+		node->name = name;
+		node->version = NULL;
+		node->has_ndx = sym.st_shndx != 0;
+		node->st_info = sym.st_info;
+		node->value = sym.st_value;
+		node->type = type;
 
 		if ((level & F_DYNS) && versym) {
 			uint16_t ndx = versym[j] & 0x7fff;
-			rows[idx].version = get_version_name(ndx, verneed_section, verstrtab);
+			node->version = get_version_name(ndx, verneed_section, verstrtab);
 		}
-
-		idx++;
 	}
 
-	return (rows);
+	return (first_node);
 }
 
 void
@@ -283,27 +344,30 @@ print_sym(t_elf_file *elf_file, int level)
 
 	ft_bverbose("Symbol table found and contains %u entries\n", elf_file->section_tables[symtab_idx].sh_size / sizeof(t_elf_sym));
 
-	nm_sym_t* rows = print_elf_sym(&elf_file->section_tables[symtab_idx], &elf_file->section_tables[symstr_idx], elf_file->section_tables, level);
-	if (!rows)
+	nm_sym_node_t* nodes = print_elf_sym(&elf_file->section_tables[symtab_idx], &elf_file->section_tables[symstr_idx], elf_file->section_tables, level);
+	if (!nodes)
 	{
 		return (1);
 	}
 
 	ft_bverbose("\n");
 
-	for (nm_sym_t* row = rows; row->name != NULL; row++)
+	sort_nodes(&nodes, level);
+
+	for (nm_sym_node_t* node = nodes; node != NULL; node = node->next)
 	{
-		if (row->has_ndx)
-			ft_verbose("%016lx ", row->value);
+		if (node->has_ndx)
+			ft_verbose("%016lx ", node->value);
 		else
 			ft_verbose("                 ");
 
-		ft_verbose("%c ", row->type);
+		ft_verbose("%c ", node->type);
 
-		if (row->version)
-			ft_verbose("%s@%s\n", row->name, row->version);
+		if (node->version)
+			ft_verbose("%s@%s\n", node->name, node->version);
 		else
-			ft_verbose("%s\n", row->name);
+			ft_verbose("%s\n", node->name);
 	}
+	free_nodes(nodes);
 	return (0);
 }

@@ -13,13 +13,13 @@ for T in "${BIN[@]}"; do
 	TARGET=./targets/$T
 	for F in "${FLAGS[@]}"; do
 		echo -e "${YELLOW}Testing $T with flag '$F'...${NC}"
-		./ft_nm $F "$TARGET" 2>&1 | sort > out.f
-		nm $F "$TARGET" 2>&1 | sort > out.m
+		./ft_nm $F "$TARGET" 2>&1 > out.f
+		nm $F "$TARGET" 2>&1 > out.m
 
 		diff out.f out.m > out.diff
 		if [ $? -ne 0 ]; then
 			echo -e "${RED}Difference found for $T with flag '$F':${NC}"
-			echo -e "./ft_nm $F "$TARGET" 2>&1 | sort > out.f"
+			echo -e "./ft_nm $F "$TARGET" 2>&1 > out.f"
 			cat out.diff
 			exit
 		else
@@ -36,13 +36,13 @@ for T in "${BIN[@]}"; do
 			if [ "$F1" != "$F2" ]; then
 				COMBO="$F1 $F2"
 				echo -e "${YELLOW}Testing $T with flags '$COMBO'...${NC}"
-				./ft_nm $COMBO "$TARGET" 2>&1 | sort > out.f
-				nm $COMBO "$TARGET" 2>&1 | sort > out.m
+				./ft_nm $COMBO "$TARGET" 2>&1 > out.f
+				nm $COMBO "$TARGET" 2>&1 > out.m
 
 				diff out.f out.m > out.diff
 				if [ $? -ne 0 ]; then
 					echo -e "${RED}Difference found for $T with flags '$COMBO':${NC}"
-					echo -e "./ft_nm $COMBO \"$TARGET\" 2>&1 | sort > out.f"
+					echo -e "./ft_nm $COMBO \"$TARGET\" 2>&1 > out.f"
 					cat out.diff
 					exit
 				else

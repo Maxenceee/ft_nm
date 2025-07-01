@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:38:16 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 12:17:34 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 12:27:45 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,8 @@ typedef struct nm_sym_s
 	uint8_t			st_info;
 	uint64_t		value;
 	char			type;
-}	nm_sym_t;
+	struct nm_sym_s *next;
+}	nm_sym_node_t;
 
 
 /**
