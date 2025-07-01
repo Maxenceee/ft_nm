@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:36:24 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 23:46:36 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 11:02:54 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ main(int ac, char** av)
 	switch (print_sym(elf_file, option))
 	{
 	case 2:
-		ft_dverbose(STDERR_FILENO, "%s: no symbols", target);
+		ft_dverbose(STDERR_FILENO, "\n%s: no symbols", target);
 		break;
 	case 1:
 		return (1);
