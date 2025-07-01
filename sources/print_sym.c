@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 12:59:01 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 13:05:07 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,16 +51,22 @@ int type_rank(char type) {
 
 static int strcmp_case_insensitive(const char *a, const char *b) {
 	while (*a && *b) {
-		char ca = ft_tolower((unsigned char)*a);
-		char cb = ft_tolower((unsigned char)*b);
-		if (ca != cb)
-			return (ca < cb) ? -1 : 1;
-		a++;
-		b++;
-	}
-	if (*a) return 1;
-	if (*b) return -1;
-	return 0;
+        unsigned char ca = (unsigned char)*a;
+        unsigned char cb = (unsigned char)*b;
+
+        // on compare en insensible à la casse pour les lettres uniquement
+        if (ca >= 'A' && ca <= 'Z') ca += 32;
+        if (cb >= 'A' && cb <= 'Z') cb += 32;
+
+        if (ca != cb)
+            return (ca < cb) ? -1 : 1;
+
+        a++;
+        b++;
+    }
+    if (*a) return 1;
+    if (*b) return -1;
+    return 0;
 }
 
 static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
