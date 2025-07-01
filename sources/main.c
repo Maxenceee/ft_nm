@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:36:24 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 18:21:44 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 18:37:53 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,10 @@ main(int ac, char** av)
 	}
 
 	if (ac - options.optind != 1)
+	{
 		usage();
+		return (64);
+	}
 	target = av[options.optind];
 
 	int fd = open(target, O_RDONLY);
