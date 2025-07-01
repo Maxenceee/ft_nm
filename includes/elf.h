@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 19:00:38 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 20:36:39 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 12:21:59 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,24 @@ struct
 	uint64_t	st_value;
 	uint64_t	st_size;
 } t_elf_sym;
+
+typedef struct
+{
+	uint16_t	vn_version;     // Version (doit être 1)
+	uint16_t	vn_cnt;         // Nombre d'entrées Vernaux
+	uint32_t	vn_file;        // Offset vers le nom de la lib (dans dynstr)
+	uint32_t	vn_aux;         // Offset relatif vers le premier Vernaux
+	uint32_t	vn_next;        // Offset relatif vers la prochaine Verneed
+} t_elf_verneed;
+
+typedef struct
+{
+	uint32_t	vna_hash;       // Hash du nom de version
+	uint16_t	vna_flags;      // Pas souvent utilisé
+	uint16_t	vna_other;      // Index utilisé dans .gnu.version
+	uint32_t	vna_name;       // Offset vers nom de version (dans dynstr)
+	uint32_t	vna_next;       // Offset relatif vers le prochain Vernaux
+} t_elf_vernaux;
 
 enum
 {

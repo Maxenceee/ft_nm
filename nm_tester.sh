@@ -2,7 +2,7 @@
 echo -e "${YELLOW}Starting ft_nm vs nm comparison tests...${NC}"
 
 BIN=("btc" "marvin_game" "rpn" "taskmasterd" "woody" "famine" "PmergeMe" "target" "webserv" "woody_woodpacker")
-FLAGS=("" "-a" "-g" "-u")
+FLAGS=("" "-a" "-g" "-u" "-D")
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'

@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:36:24 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 11:12:26 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 12:12:46 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,17 @@
 
 static void	usage(void)
 {
-	(void)fprintf(stderr, "%s\n", "usage: ft_nm <option(s)> file");
-	(void)fprintf(stderr, "  %s\n", "Options are:");
-	(void)fprintf(stderr, "  %s, %-20s %s\n", "-a", "--debug-syms", "Show all symbols, even debugger only");
-	(void)fprintf(stderr, "  %s, %-20s %s\n", "-g", "--extern-only", "Show only external symbols");
-	(void)fprintf(stderr, "  %s, %-20s %s\n", "-u", "--undefined-only", "Show only undefined symbols");
-	(void)fprintf(stderr, "  %s, %-20s %s\n", "-r", "--reverse-sort", "Sort in reverse order");
-	(void)fprintf(stderr, "  %s, %-20s %s\n", "-p", "--no-sort", "Show symbols in order encountered");
-	(void)fprintf(stderr, "  %s, %-20s %s\n", "-h", "--help", "Display this help");
-	(void)fprintf(stderr, "  %s, %-20s %s\n", "-v", "--version", "Display the version");
+	(void)ft_dverbose(STDERR_FILENO, "%s\n", "usage: ft_nm <option(s)> file");
+	(void)ft_dverbose(STDERR_FILENO, "  %s\n", "Options are:");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-a", "--debug-syms", "Show all symbols, even debugger only");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-g", "--extern-only", "Show only external symbols");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-u", "--undefined-only", "Show only undefined symbols");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-D", "--dynamic", "Display dynamic symbols instead of normal symbols");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-r", "--reverse-sort", "Sort in reverse order");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-p", "--no-sort", "Show symbols in order encountered");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-h", "--help", "Display this help");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-d", "--debug", "Display debug information");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-v", "--version", "Display the version");
 	exit(64);
 }
 
@@ -36,14 +38,17 @@ main(int ac, char** av)
 		{"debug-syms", 'a', OPTPARSE_NONE},
 		{"extern-only", 'g', OPTPARSE_NONE},
 		{"undefined-only", 'u', OPTPARSE_NONE},
+		{"dynamic", 'D', OPTPARSE_NONE},
 		{"reverse-sort", 'r', OPTPARSE_NONE},
 		{"no-sort", 'p', OPTPARSE_NONE},
 		{"help", 'h', OPTPARSE_NONE},
+		{"debug", 'd', OPTPARSE_NONE},
 		{"version", 'v', OPTPARSE_NONE},
-		{"d", 'd', OPTPARSE_NONE},
 		{0}
 	};
 	struct getopt_s options;
+
+	ft_verbose_mode(VERBOSE_INFO | VERBOSE_NOCOLOR);
 
 	ft_getopt_init(&options, av);
 	while ((ch = ft_getopt(&options, optlist, NULL)) != -1) {
@@ -63,8 +68,11 @@ main(int ac, char** av)
 			case 'p':
 				option |= F_NSRT;
 				break;
+			case 'D':
+				option |= F_DYNS;
+				break;
 			case 'd':
-				option = -1;
+				ft_verbose_mode(VERBOSE_INFO | VERBOSE_DEBUG | VERBOSE_COLOR);
 				break;
 			case 'v':
 				ft_verbose(B_PINK"ft_nm version %s%s%s by %s%s%s\n"RESET, CYAN, NM_VERSION, B_PINK, CYAN, NM_AUTHOR, RESET);
@@ -78,8 +86,6 @@ main(int ac, char** av)
 	if (ac - options.optind != 1)
 		usage();
 	target = av[options.optind];
-
-	verbose_mode = VERBOSE_ON;
 
 	int fd = open(target, O_RDONLY);
 	if (fd == -1)
@@ -96,9 +102,7 @@ main(int ac, char** av)
 		return (1);
 	}
 
-	verbose_mode = VERBOSE_OFF;
 	t_elf_file *elf_file = new_elf_file(reader);
-	verbose_mode = VERBOSE_ON;
 	if (elf_file == NULL)
 	{
 		ft_dverbose(STDERR_FILENO, NM_PREFIX"The file was not recognized as a valid object file\n");
@@ -111,7 +115,6 @@ main(int ac, char** av)
 		print_elf_file(elf_file, PELF_SECTION | PELF_PROG | PELF_SYM);
 		printf("\n\n");
 	}
-	verbose_color = VERBOSE_COLOR_OFF;
 
 	switch (print_sym(elf_file, option))
 	{

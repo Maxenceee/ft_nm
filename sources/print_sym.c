@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 11:12:38 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 12:23:02 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,10 +84,55 @@ get_elf_sym_type(t_elf_sym *sym, t_elf_section *all_sections)
 	return '?';
 }
 
+static char *
+get_version_name(uint16_t ndx, t_elf_section *verneed_section, char *verstrtab)
+{
+	if (!verneed_section || !verstrtab || ndx <= 1)
+		return NULL;
+
+	uint8_t *data = verneed_section->data;
+	size_t offset = 0;
+
+	while (offset < verneed_section->sh_size) {
+		t_elf_verneed *vern = (t_elf_verneed *)(data + offset);
+		size_t aux_offset = offset + vern->vn_aux;
+
+		for (int i = 0; i < vern->vn_cnt; i++) {
+			t_elf_vernaux *aux = (t_elf_vernaux *)(data + aux_offset);
+			if (aux->vna_other == ndx)
+				return verstrtab + aux->vna_name;
+
+			aux_offset += aux->vna_next;
+		}
+		offset += vern->vn_next;
+	}
+
+	return NULL;
+}
+
 static nm_sym_t*
 print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_section *all_sections, int level)
 {
 	size_t container_size = 0;
+	uint16_t *versym = NULL;
+	t_elf_section *verneed_section = NULL;
+	char *verstrtab = NULL;
+
+	if (level & F_DYNS) {
+		for (size_t i = 0; all_sections[i].sh_name != NULL; i++) {
+			if (all_sections[i].sh_type == SHT_GNU_versym &&
+				ft_strcmp(all_sections[i].sh_name, ".gnu.version") == 0)
+				versym = (uint16_t *)all_sections[i].data;
+
+			if (all_sections[i].sh_type == SHT_GNU_verneed &&
+				ft_strcmp(all_sections[i].sh_name, ".gnu.version_r") == 0)
+				verneed_section = &all_sections[i];
+
+			if (all_sections[i].sh_type == SHT_STRTAB &&
+				ft_strcmp(all_sections[i].sh_name, ".dynstr") == 0)
+				verstrtab = (char *)all_sections[i].data;
+		}
+	}
 
 	t_elf_sym sym;
 	for (size_t j = 0; j * sizeof(t_elf_sym) < sym_section->sh_size; j++) {
@@ -181,15 +226,44 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 		char type = get_elf_sym_type(&sym, all_sections);
 
 		rows[idx].name = name;
+		rows[idx].version = NULL;
 		rows[idx].has_ndx = sym.st_shndx != 0;
 		rows[idx].st_info = sym.st_info;
 		rows[idx].value = sym.st_value;
 		rows[idx].type = type;
 
+		if ((level & F_DYNS) && versym) {
+			uint16_t ndx = versym[j] & 0x7fff;
+			rows[idx].version = get_version_name(ndx, verneed_section, verstrtab);
+		}
+
 		idx++;
 	}
 
 	return (rows);
+}
+
+void
+get_symbol_indexes(t_elf_file *elf_file, int level, int* symtab, int* symstr)
+{
+	if (level & F_DYNS)
+	{
+		for (uint16_t i = 0; i < elf_file->e_shnum; i++) {
+			if (ft_strcmp(elf_file->section_tables[i].sh_name, ".dynsym") == 0 && elf_file->section_tables[i].sh_type == SHT_DYNSYM)
+				*symtab = i;
+			else if (ft_strcmp(elf_file->section_tables[i].sh_name, ".dynstr") == 0 && elf_file->section_tables[i].sh_type == SHT_STRTAB)
+				*symstr = i;
+		}
+	}
+	else
+	{
+		for (uint16_t i = 0; i < elf_file->e_shnum; i++) {
+			if (ft_strcmp(elf_file->section_tables[i].sh_name, ".symtab") == 0 && elf_file->section_tables[i].sh_type == SHT_SYMTAB)
+				*symtab = i;
+			else if (ft_strcmp(elf_file->section_tables[i].sh_name, ".strtab") == 0 && elf_file->section_tables[i].sh_type == SHT_STRTAB)
+				*symstr = i;
+		}
+	}
 }
 
 int
@@ -198,23 +272,24 @@ print_sym(t_elf_file *elf_file, int level)
 	int symtab_idx = 0;
 	int symstr_idx = 0;
 
-	for (uint16_t i = 0; i < elf_file->e_shnum; i++) {
-		if (ft_strcmp(elf_file->section_tables[i].sh_name, ".symtab") == 0 && elf_file->section_tables[i].sh_type == SHT_SYMTAB)
-			symtab_idx = i;
-		else if (ft_strcmp(elf_file->section_tables[i].sh_name, ".strtab") == 0 && elf_file->section_tables[i].sh_type == SHT_STRTAB)
-			symstr_idx = i;
-	}
+	ft_bverbose("\nLocating symbol table...\n");
+
+	get_symbol_indexes(elf_file, level, &symtab_idx, &symstr_idx);
 
 	if (elf_file->section_tables[symtab_idx].sh_size == 0 || elf_file->section_tables[symtab_idx].sh_type == SHT_NOBITS)
 	{
 		return (2);
 	}
 
+	ft_bverbose("Symbol table found and contains %u entries\n", elf_file->section_tables[symtab_idx].sh_size / sizeof(t_elf_sym));
+
 	nm_sym_t* rows = print_elf_sym(&elf_file->section_tables[symtab_idx], &elf_file->section_tables[symstr_idx], elf_file->section_tables, level);
 	if (!rows)
 	{
 		return (1);
 	}
+
+	ft_bverbose("\n");
 
 	for (nm_sym_t* row = rows; row->name != NULL; row++)
 	{
@@ -225,8 +300,8 @@ print_sym(t_elf_file *elf_file, int level)
 
 		ft_verbose("%c ", row->type);
 
-		if (row->has_ndx)
-			ft_verbose("%s\n", row->name);
+		if (row->version)
+			ft_verbose("%s@%s\n", row->name, row->version);
 		else
 			ft_verbose("%s\n", row->name);
 	}
