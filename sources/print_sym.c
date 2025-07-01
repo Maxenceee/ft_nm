@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 13:08:59 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 13:11:19 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,31 @@ static int strcmp_case_insensitive(const char *a, const char *b) {
 	return 0;
 }
 
+static int strcmp_case_sensitive(const char *a, const char *b) {
+	while (*a && *b) {
+		if (*a != *b)
+			return ((unsigned char)*a < (unsigned char)*b) ? -1 : 1;
+		a++;
+		b++;
+	}
+	if (*a) return 1;
+	if (*b) return -1;
+	return 0;
+}
+
+static int strcmp_case_insensitive_then_sensitive(const char *a, const char *b) {
+	int res = strcmp_case_insensitive(a, b);
+	if (res != 0)
+		return res;
+	return strcmp_case_sensitive(a, b);
+}
+
 static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
 {
 	const char *name_a = skip_prefix(a->name);
 	const char *name_b = skip_prefix(b->name);
 
-	int res = strcmp_case_insensitive(name_a, name_b);
+	int res = strcmp_case_insensitive_then_sensitive(name_a, name_b);
 
 	if (res == 0) {
 		int rank_a = type_rank(a->type);
