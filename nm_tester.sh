@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "${YELLOW}Starting ft_nm vs nm comparison tests...${NC}"
 
 BIN=("btc" "marvin_game" "rpn" "taskmasterd" "woody" "famine" "PmergeMe" "target" "webserv" "woody_woodpacker")
