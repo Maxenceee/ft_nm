@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 15:00:49 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 18:10:24 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
 	build_full_name(full_name_a, sizeof(full_name_a), a->name, a->version);
 	build_full_name(full_name_b, sizeof(full_name_b), b->name, b->version);
 
-	int res = strcmp(full_name_a, full_name_b);
+	int res = ft_strcmp(full_name_a, full_name_b);
 
 	if (res == 0) {
 		// Si les noms sont identiques, trier par adresse
@@ -208,7 +208,7 @@ get_elf_sym_type(t_elf_sym *sym, t_elf_section *all_sections)
 	t_elf_section *sec = &all_sections[ndx];
 	const char *secname = sec->sh_name;
 
-	if (strncmp(secname, ".debug_", 7) == 0 || strncmp(secname, ".zdebug_", 8) == 0)
+	if (ft_strncmp(secname, ".debug_", 7) == 0 || ft_strncmp(secname, ".zdebug_", 8) == 0)
 	{
 		return 'N';
 	}

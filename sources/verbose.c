@@ -6,12 +6,13 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 21:42:23 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 11:44:43 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 18:14:24 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "verbose.h"
 #include "pcolors.h"
+#include "utils/utils.h"
 
 typedef struct s_format_opts
 {
@@ -48,9 +49,9 @@ ft_putstr(int fd, char *s)
 
 	if (!s)
 		s = "(null)";
-	c = strlen(s);
+	c = ft_strlen(s);
 	write(fd, s, c);
-	if (strncmp(s, "\033[", 2) != 0 && strncmp(s, "\x1b[", 2) != 0)
+	if (ft_strncmp(s, "\033[", 2) != 0 && ft_strncmp(s, "\x1b[", 2) != 0)
 		verbose_size += c;
 }
 
@@ -62,7 +63,7 @@ ft_putstr_padded(int fd, char *s, int width, int left_align)
 
 	if (!s)
 		s = "(null)";
-	len = strlen(s);
+	len = ft_strlen(s);
 	padding = width - (int)len;
 	
 	if (padding > 0)
@@ -73,7 +74,7 @@ ft_putstr_padded(int fd, char *s, int width, int left_align)
 				ft_putchar(fd, ' ');
 		}
 		write(fd, s, len);
-		if (strncmp(s, "\033[", 2) != 0 && strncmp(s, "\x1b[", 2) != 0)
+		if (ft_strncmp(s, "\033[", 2) != 0 && ft_strncmp(s, "\x1b[", 2) != 0)
 			verbose_size += len;
 		if (left_align) // Left align - pad after string
 		{
@@ -84,7 +85,7 @@ ft_putstr_padded(int fd, char *s, int width, int left_align)
 	else
 	{
 		write(fd, s, len);
-		if (strncmp(s, "\033[", 2) != 0 && strncmp(s, "\x1b[", 2) != 0)
+		if (ft_strncmp(s, "\033[", 2) != 0 && ft_strncmp(s, "\x1b[", 2) != 0)
 			verbose_size += len;
 	}
 }
