@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:36:24 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 12:12:46 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 18:21:44 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ static void	usage(void)
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-h", "--help", "Display this help");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-d", "--debug", "Display debug information");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-v", "--version", "Display the version");
-	exit(64);
 }
 
 int
@@ -76,10 +75,11 @@ main(int ac, char** av)
 				break;
 			case 'v':
 				ft_verbose(B_PINK"ft_nm version %s%s%s by %s%s%s\n"RESET, CYAN, NM_VERSION, B_PINK, CYAN, NM_AUTHOR, RESET);
-				exit(0);
+				return (0);
 			case 'h':
 			default:
 				usage();
+				return (64);
 		}
 	}
 
@@ -108,12 +108,6 @@ main(int ac, char** av)
 		ft_dverbose(STDERR_FILENO, NM_PREFIX"The file was not recognized as a valid object file\n");
 		delete_binary_reader(reader);
 		return (1);
-	}
-
-	if (option == -1)
-	{
-		print_elf_file(elf_file, PELF_SECTION | PELF_PROG | PELF_SYM);
-		printf("\n\n");
 	}
 
 	switch (print_sym(elf_file, option))
