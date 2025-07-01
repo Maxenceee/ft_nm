@@ -6,11 +6,12 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 13:23:23 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 13:25:44 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nm.h"
+#include <ctype.h>
 
 void
 free_nodes(nm_sym_node_t *node)
@@ -50,29 +51,40 @@ int type_rank(char type) {
 }
 
 static int strcmp_case(const char *a, const char *b) {
-	while (*a && *b) {
-        // Skip underscores in a
+	if (*a != *b) {
+        unsigned char ca = (unsigned char)*a;
+        unsigned char cb = (unsigned char)*b;
+        if (tolower(ca) != tolower(cb))
+            return (tolower(ca) < tolower(cb)) ? -1 : 1;
+    }
+
+    // Avancer au 2e char
+    a++;
+    b++;
+
+    while (*a && *b) {
+        // Skip underscore dans a
         while (*a == '_')
             a++;
-        // Skip underscores in b
+        // Skip underscore dans b
         while (*b == '_')
             b++;
-        // If one string ended while skipping, break
         if (!*a || !*b)
             break;
 
-        char ca = ft_tolower((unsigned char)*a);
-        char cb = ft_tolower((unsigned char)*b);
+        char ca = tolower((unsigned char)*a);
+        char cb = tolower((unsigned char)*b);
+
         if (ca != cb)
             return (ca < cb) ? -1 : 1;
+
         a++;
         b++;
     }
 
-    // Skip trailing underscores in a
+    // Skip trailing underscores
     while (*a == '_')
         a++;
-    // Skip trailing underscores in b
     while (*b == '_')
         b++;
 
