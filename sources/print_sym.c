@@ -6,12 +6,11 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 13:25:44 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 13:27:22 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "nm.h"
-#include <ctype.h>
 
 void
 free_nodes(nm_sym_node_t *node)
@@ -51,43 +50,13 @@ int type_rank(char type) {
 }
 
 static int strcmp_case(const char *a, const char *b) {
-	if (*a != *b) {
-        unsigned char ca = (unsigned char)*a;
-        unsigned char cb = (unsigned char)*b;
-        if (tolower(ca) != tolower(cb))
-            return (tolower(ca) < tolower(cb)) ? -1 : 1;
-    }
-
-    // Avancer au 2e char
-    a++;
-    b++;
-
-    while (*a && *b) {
-        // Skip underscore dans a
-        while (*a == '_')
-            a++;
-        // Skip underscore dans b
-        while (*b == '_')
-            b++;
-        if (!*a || !*b)
-            break;
-
-        char ca = tolower((unsigned char)*a);
-        char cb = tolower((unsigned char)*b);
-
-        if (ca != cb)
-            return (ca < cb) ? -1 : 1;
-
+	while (*a && *b) {
+        int cmp = cmp_char_special(*a, *b);
+        if (cmp != 0)
+            return cmp;
         a++;
         b++;
     }
-
-    // Skip trailing underscores
-    while (*a == '_')
-        a++;
-    while (*b == '_')
-        b++;
-
     if (*a) return 1;
     if (*b) return -1;
     return 0;
@@ -95,7 +64,10 @@ static int strcmp_case(const char *a, const char *b) {
 
 static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
 {
-	int res = strcmp_case(a->name, b->name);
+	const char *name_a = skip_prefix(a->name);
+	const char *name_b = skip_prefix(b->name);
+
+	int res = strcmp_case(name_a, name_b);
 
 	if (res == 0) {
 		int rank_a = type_rank(a->type);
