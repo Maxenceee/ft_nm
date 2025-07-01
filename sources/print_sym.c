@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 13:17:34 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 13:20:35 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,25 +49,30 @@ int type_rank(char type) {
     }
 }
 
-static int strcmp_case_insensitive(const char *a, const char *b) {
+static int cmp_char_special(char a, char b) {
+    if (a == b) return 0;
+    if (a == '_') return -1; // _ avant tout autre caractère
+    if (b == '_') return 1;
+    
+    // Comparaison case-insensitive classique
+    char ca = ft_tolower((unsigned char)a);
+    char cb = ft_tolower((unsigned char)b);
+    if (ca < cb) return -1;
+    if (ca > cb) return 1;
+    return 0;
+}
+
+static int strcmp_case(const char *a, const char *b) {
 	while (*a && *b) {
-        unsigned char ca_lower = (unsigned char)ft_tolower((unsigned char)*a);
-        unsigned char cb_lower = (unsigned char)ft_tolower((unsigned char)*b);
-
-        if (ca_lower != cb_lower)
-            return (ca_lower < cb_lower) ? -1 : 1;
-
-        // Si les lettres en lowercase sont égales, comparer l’ASCII original
-        if (*a != *b)
-            return (*a < *b) ? -1 : 1;
-
+        int cmp = cmp_char_special(*a, *b);
+        if (cmp != 0)
+            return cmp;
         a++;
         b++;
     }
     if (*a) return 1;
     if (*b) return -1;
     return 0;
-
 }
 
 static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
@@ -75,7 +80,7 @@ static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
 	const char *name_a = skip_prefix(a->name);
 	const char *name_b = skip_prefix(b->name);
 
-	int res = strcmp_case_insensitive(name_a, name_b);
+	int res = strcmp_case(name_a, name_b);
 
 	if (res == 0) {
 		int rank_a = type_rank(a->type);
