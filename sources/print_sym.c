@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 12:57:57 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 12:59:01 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,27 @@ static const char* skip_prefix(const char* s) {
 	return s;
 }
 
+int type_rank(char type) {
+    switch(type) {
+        case 'U': return 7;  // undefined
+        case 'w': return 6;  // weak object
+        case 'W': return 5;  // weak object (strong)
+        case 'B': return 4;  // bss
+        case 'D': return 3;  // data
+        case 'R': return 2;  // read only data
+        case 'T': return 1;  // text (code)
+        case 't': return 1;  // text (local)
+        case 'd': return 3;  // data (local)
+        case 'b': return 4;  // bss (local)
+        // ajoute d'autres types selon besoin
+        default:  return 8;  // autres types moins prioritaires
+    }
+}
+
 static int strcmp_case_insensitive(const char *a, const char *b) {
 	while (*a && *b) {
-		char ca = tolower((unsigned char)*a);
-		char cb = tolower((unsigned char)*b);
+		char ca = ft_tolower((unsigned char)*a);
+		char cb = ft_tolower((unsigned char)*b);
 		if (ca != cb)
 			return (ca < cb) ? -1 : 1;
 		a++;

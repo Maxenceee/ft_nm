@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/07 19:02:43 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 11:09:17 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 13:00:23 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,9 @@ int		check_separator(char c, char *charset);
 
 char	**free_tab(char **tab);
 char	**ft_split(const char *str, char *charset);
+
+char	ft_tolower(unsigned char c);
+char	ft_toupper(unsigned char c);
 
 int		ft_strcmp(const char *s1, const char *s2);
 int		ft_strncmp(const char *s1, const char *s2, uint32_t n);
