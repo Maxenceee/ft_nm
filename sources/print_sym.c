@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 12:51:21 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 12:57:57 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,41 +25,46 @@ free_nodes(nm_sym_node_t *node)
 	}
 }
 
-int type_rank(char type) {
-    switch(type) {
-        case 'U': return 7;  // undefined
-        case 'w': return 6;  // weak object
-        case 'W': return 5;  // weak object (strong)
-        case 'B': return 4;  // bss
-        case 'D': return 3;  // data
-        case 'R': return 2;  // read only data
-        case 'T': return 1;  // text (code)
-        case 't': return 1;  // text (local)
-        case 'd': return 3;  // data (local)
-        case 'b': return 4;  // bss (local)
-        // ajoute d'autres types selon besoin
-        default:  return 8;  // autres types moins prioritaires
-    }
+static const char* skip_prefix(const char* s) {
+	while (*s == '_' || *s == '*') {
+		s++;
+	}
+	return s;
+}
+
+static int strcmp_case_insensitive(const char *a, const char *b) {
+	while (*a && *b) {
+		char ca = tolower((unsigned char)*a);
+		char cb = tolower((unsigned char)*b);
+		if (ca != cb)
+			return (ca < cb) ? -1 : 1;
+		a++;
+		b++;
+	}
+	if (*a) return 1;
+	if (*b) return -1;
+	return 0;
 }
 
 static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
 {
-	if (!a->name || !b->name)
-		return 0;
+	const char *name_a = skip_prefix(a->name);
+	const char *name_b = skip_prefix(b->name);
 
-	int res = strcmp(a->name, b->name);
-    if (res == 0) {
-        int rank_a = type_rank(a->type);
-        int rank_b = type_rank(b->type);
-        if (rank_a != rank_b)
-            return (rank_a < rank_b) ? -1 : 1;
-        if (a->value != b->value)
-            return (a->value < b->value) ? -1 : 1;
-        return 0;
-    }
-    if (level & F_RSRT)
-        return -res;
-    return res;
+	int res = strcmp_case_insensitive(name_a, name_b);
+
+	if (res == 0) {
+		int rank_a = type_rank(a->type);
+		int rank_b = type_rank(b->type);
+		if (rank_a != rank_b)
+			return (rank_a < rank_b) ? -1 : 1;
+		if (a->value != b->value)
+			return (a->value < b->value) ? -1 : 1;
+		return 0;
+	}
+	if (level & F_RSRT)
+		return -res;
+	return res;
 }
 
 static nm_sym_node_t *merge_sorted_lists(nm_sym_node_t *a, nm_sym_node_t *b, int level)
