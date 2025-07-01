@@ -6,11 +6,11 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 12:59:26 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 12:59:46 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 13:01:26 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "util.h"
+#include "utils.h"
 
 char	ft_tolower(unsigned char c)
 {
