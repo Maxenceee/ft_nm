@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 14:56:42 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 15:00:49 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,12 @@ static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
 
 	if (res == 0) {
 		// Si les noms sont identiques, trier par adresse
-		return (a->value < b->value) ? -1 : 1;
+		if (a->value == b->value)
+			return 0;
+		if (level & F_RSRT)
+			return (a->value > b->value) ? -1 : 1;
+		else
+			return (a->value < b->value) ? -1 : 1;
 	}
 	if (level & F_RSRT)
 		return -res;
