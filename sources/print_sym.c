@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 00:19:24 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 11:12:38 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 	nm_sym_t* rows = malloc(sizeof(nm_sym_t) * (container_size + 1));
 	if (!rows)
 	{
-		ft_error("Could not allocate memory for symbol table");
+		ft_dverbose(STDERR_FILENO, NM_PREFIX"Could not allocate memory for symbol table\n");
 		return (NULL);
 	}
 	ft_bzero(rows, sizeof(nm_sym_t) * (container_size + 1));

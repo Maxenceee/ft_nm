@@ -20,7 +20,7 @@ get_elf_program_headers(t_elf_file *elf_file, t_binary_reader *reader)
 
 	elf_file->program_headers = ft_calloc(elf_file->e_phnum, sizeof(t_elf_program_header));
 	if (elf_file->program_headers == NULL)
-		return (ft_error("Could not allocate memory"), -1);
+		return (ft_dverbose(STDERR_FILENO, "Could not allocate memory\n"), -1);
 
 	for (int i = 0; i < elf_file->e_phnum; i++)
 	{
@@ -39,7 +39,7 @@ get_elf_program_headers(t_elf_file *elf_file, t_binary_reader *reader)
 			|| elf_file->program_headers[i].p_align < 1
 		)
 		{
-			return (ft_error("Could not read file because of incoeherent values"), -1);
+			return (ft_dverbose(STDERR_FILENO, "Could not read file because of incoeherent values\n"), -1);
 		}
 	}
 	ft_verbose("Program header contains %d entries\n", elf_file->e_phnum);
@@ -54,7 +54,7 @@ get_elf_tables_offset(t_elf_file *elf_file, t_binary_reader *reader)
 
 	elf_file->section_tables = ft_calloc(elf_file->e_shnum, sizeof(t_elf_section));
 	if (elf_file->section_tables == NULL)
-		return (ft_error("Could not allocate memory"), -1);
+		return (ft_dverbose(STDERR_FILENO, "Could not allocate memory\n"), -1);
 
 	for (int i = 0; i < elf_file->e_shnum; i++)
 	{
@@ -76,7 +76,7 @@ get_elf_tables_offset(t_elf_file *elf_file, t_binary_reader *reader)
 			|| elf_file->section_tables[i].sh_addralign < 1
 		)
 		{
-			return (ft_error("Could not read file because of incoeherent values"), -1);
+			return (ft_dverbose(STDERR_FILENO, "Could not read file because of incoeherent values\n"), -1);
 		}
 	}
 
@@ -89,7 +89,7 @@ get_elf_tables_offset(t_elf_file *elf_file, t_binary_reader *reader)
 			reader->seek(reader, elf_file->section_tables[elf_file->e_shstrndx].sh_offset + elf_file->section_tables[i].sh_name_offset);
 			elf_file->section_tables[i].sh_name = reader->get_rstring(reader);
 			if (elf_file->section_tables[i].sh_name == NULL)
-				return (ft_error("Could not allocate memory"), -1);
+				return (ft_dverbose(STDERR_FILENO, "Could not allocate memory"), -1);
 		}
 	}
 	else
@@ -105,7 +105,7 @@ get_elf_tables_offset(t_elf_file *elf_file, t_binary_reader *reader)
 
 			elf_file->section_tables[i].data = malloc(elf_section_data_size);
 			if (elf_file->section_tables[i].data == NULL) {
-				return (ft_error("Could not allocate memory"), -1);
+				return (ft_dverbose(STDERR_FILENO, "Could not allocate memory\n"), -1);
 			}
 
 			ft_memset(elf_file->section_tables[i].data, 0, elf_section_data_size);
@@ -122,7 +122,7 @@ new_elf_file(t_binary_reader *reader)
 {
 	t_elf_file *elf_file = ft_calloc(1, sizeof(t_elf_file));
 	if (elf_file == NULL)
-		return (ft_error("Could not allocate memory"), NULL);
+		return (ft_dverbose(STDERR_FILENO, "Could not allocate memory\n"), NULL);
 
 	ft_verbose("\nStarting file parsing...\n");
 	/**
@@ -136,7 +136,7 @@ new_elf_file(t_binary_reader *reader)
 	if (elf_file->e_ident.ei_magic != 0x464C457F) // 0x7F 'E' 'L' 'F' but reversed because of endianness
 	{
 		ft_verbose("%s\n", B_RED"invalid"RESET);
-		return (ft_error("Invalid file format"), NULL);
+		return (ft_dverbose(STDERR_FILENO, "Invalid file format\n"), NULL);
 	}
 
 	ft_verbose("%s\n", B_GREEN"valid"RESET);
@@ -144,7 +144,7 @@ new_elf_file(t_binary_reader *reader)
 	ft_verbose("\nReading ELF class...\n");
 	if (elf_file->e_ident.ei_class != ELF_64BITS)
 	{
-		return (ft_error("Incompatible class or unsupported class"), NULL);
+		return (ft_dverbose(STDERR_FILENO, "Incompatible class or unsupported class\n"), NULL);
 	}
 	ft_verbose("Class: %s%s%s\n", B_CYAN, elf_file->e_ident.ei_class == ELF_32BITS ? "32 bits" : "64 bits", RESET);
 
@@ -174,7 +174,7 @@ new_elf_file(t_binary_reader *reader)
 	 */
 	if (elf_file->e_ident.ei_version != 1)
 	{
-		return (ft_error("Wrong version"), NULL);
+		return (ft_dverbose(STDERR_FILENO, "Wrong version\n"), NULL);
 	}
 
 	/**
@@ -182,7 +182,7 @@ new_elf_file(t_binary_reader *reader)
 	 */
 	if (elf_file->e_ident.ei_osabi != 0x00 && elf_file->e_ident.ei_osabi != 0x03)
 	{
-		return (ft_error("Incompatible ABI"), NULL);
+		return (ft_dverbose(STDERR_FILENO, "Incompatible ABI\n"), NULL);
 	}
 
 	reader->seek(reader, 0x10);
@@ -211,7 +211,7 @@ new_elf_file(t_binary_reader *reader)
 	)
 	{
 		delete_elf_file(elf_file);
-		return (ft_error("Could not read file because of incoeherent values"), NULL);
+		return (ft_dverbose(STDERR_FILENO, "Could not read file because of incoeherent values\n"), NULL);
 	}
 
 	if (get_elf_program_headers(elf_file, reader) == -1)

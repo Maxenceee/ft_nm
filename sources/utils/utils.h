@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/07 19:02:43 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 18:11:00 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 11:09:17 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,6 @@
 
 #include "ft_getopt.h"
 #include "pcolors.h"
-
-int		ft_error(const char *str);
-int		ft_error_msg(const char *str, const char *msg);
-int		ft_warning(const char *str);
-int		ft_info(const char *str);
 
 int		ft_atoi(const char *str);
 int		ft_ctoi(const char str);

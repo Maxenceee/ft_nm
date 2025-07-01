@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:38:16 by mgama             #+#    #+#             */
-/*   Updated: 2025/06/30 23:41:18 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 11:08:33 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,11 @@
 #define NM_VERSION "1.0"
 #define NM_AUTHOR "mgama"
 
-#define NM_PREFIX "nm"
+#ifdef __APPLE__
+#define NM_PREFIX ""
+#else
+#define NM_PREFIX "nm: "
+#endif /* __APPLE__ */
 
 /**
  * Options

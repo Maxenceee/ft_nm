@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:36:24 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 11:02:54 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/01 11:12:26 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ main(int ac, char** av)
 	int fd = open(target, O_RDONLY);
 	if (fd == -1)
 	{
-		ft_error_msg("Cannot open file", target);
+		ft_dverbose(STDERR_FILENO, NM_PREFIX"Cannot open file: %s\n", target);
 		return (1);
 	}
 
@@ -92,7 +92,7 @@ main(int ac, char** av)
 	close(fd);
 	if (!reader)
 	{
-		ft_error_msg("Cannot read file", target);
+		ft_dverbose(STDERR_FILENO, NM_PREFIX"Cannot read file: %s\n", target);
 		return (1);
 	}
 
@@ -101,7 +101,7 @@ main(int ac, char** av)
 	verbose_mode = VERBOSE_ON;
 	if (elf_file == NULL)
 	{
-		ft_error("The file was not recognized as a valid object file");
+		ft_dverbose(STDERR_FILENO, NM_PREFIX"The file was not recognized as a valid object file\n");
 		delete_binary_reader(reader);
 		return (1);
 	}
@@ -116,7 +116,7 @@ main(int ac, char** av)
 	switch (print_sym(elf_file, option))
 	{
 	case 2:
-		ft_dverbose(STDERR_FILENO, "\n%s: no symbols", target);
+		ft_dverbose(STDERR_FILENO, NM_PREFIX"%s: no symbols\n", target);
 		break;
 	case 1:
 		return (1);
