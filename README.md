@@ -1,6 +1,6 @@
 # FT_NM
 
-nm (name mangling) is a tool that can be used to list symbols from object files.
+My nm projet for the 42 School cursus. The project nm (name mangling) is a tool that can be used to list symbols from object files.
 
 ## Getting started
 
