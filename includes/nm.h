@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:38:16 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 12:27:45 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/02 16:44:08 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,22 @@
  * Options
  */
 
-#define F_ALL		0x01
-#define F_EXTO		0x02
-#define F_UNDO		0x04
-#define F_DYNS		0x08
-#define F_RSRT		0x10
-#define F_NSRT		0x20
+#define F_ALL		0x00000010
+#define F_EXTO		0x00000020
+#define F_UNDO		0x00000040
+#define F_DFNO		0x00000080
+#define F_DYNS		0x00000100
+
+#define F_RSRT		0x00001000
+#define F_NSRT		0x00002000
+#define F_ASRT		0x00004000
+
+#define F_RDX_DEC	0X01000000
+#define F_RDX_HEX	0x02000000
+#define F_RDX_OCT	0x04000000
+#define F_RDX_MASK	0X0F000000
+
+#define F_RADIX(r) (r & F_RDX_MASK)
 
 int		print_sym(t_elf_file *elf_file, int level);
 

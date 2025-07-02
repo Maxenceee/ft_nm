@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 18:10:24 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/02 16:57:57 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,23 +25,6 @@ free_nodes(nm_sym_node_t *node)
 	}
 }
 
-int type_rank(char type) {
-	switch(type) {
-		case 'U': return 7;  // undefined
-		case 'w': return 6;  // weak object
-		case 'W': return 5;  // weak object (strong)
-		case 'B': return 4;  // bss
-		case 'D': return 3;  // data
-		case 'R': return 2;  // read only data
-		case 'T': return 1;  // text (code)
-		case 't': return 1;  // text (local)
-		case 'd': return 3;  // data (local)
-		case 'b': return 4;  // bss (local)
-		// ajoute d'autres types selon besoin
-		default:  return 8;  // autres types moins prioritaires
-	}
-}
-
 void
 build_full_name(char *dest, size_t dest_size, char *name, char *version)
 {
@@ -49,20 +32,24 @@ build_full_name(char *dest, size_t dest_size, char *name, char *version)
     size_t j = 0;
 
     // Copie name dans dest
-    while (name[i] && i + 1 < dest_size) {
+    while (name[i] && i + 1 < dest_size)
+	{
         dest[i] = name[i];
         i++;
     }
 
     // Si version existe et il reste de la place, ajoute '@'
-    if (version && i + 1 < dest_size) {
+    if (version && i + 1 < dest_size)
+	{
         dest[i] = '@';
         i++;
     }
 
     // Copie version dans dest après '@'
-    if (version) {
-        while (version[j] && i + 1 < dest_size) {
+    if (version)
+	{
+        while (version[j] && i + 1 < dest_size)
+		{
             dest[i] = version[j];
             i++;
             j++;
@@ -74,9 +61,29 @@ build_full_name(char *dest, size_t dest_size, char *name, char *version)
         dest[i] = '\0';
 }
 
-static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
+static int
+cmp_diff(const uint64_t a, const uint64_t b)
 {
-	// Construire les chaînes complètes nom@version pour la comparaison
+	if (a < b)
+		return (-1);
+	else if (a > b)
+		return (1);
+	else
+		return (0);
+}
+
+static int
+cmp_sym_num(const nm_sym_node_t *a, const nm_sym_node_t *b)
+{
+	if (!a->has_ndx || !b->has_ndx)
+		return (a->has_ndx - b->has_ndx);
+
+	return cmp_diff(a->value, b->value);
+}
+
+static int
+cmp_sym_name(const nm_sym_node_t *a, const nm_sym_node_t *b)
+{
 	char full_name_a[1024];
 	char full_name_b[1024];
 
@@ -84,46 +91,68 @@ static int cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
 	build_full_name(full_name_b, sizeof(full_name_b), b->name, b->version);
 
 	int res = ft_strcmp(full_name_a, full_name_b);
-
-	if (res == 0) {
-		// Si les noms sont identiques, trier par adresse
-		if (a->value == b->value)
-			return 0;
-		if (level & F_RSRT)
-			return (a->value > b->value) ? -1 : 1;
-		else
-			return (a->value < b->value) ? -1 : 1;
+	if (res == 0)
+	{
+		return cmp_diff(a->value, b->value);
 	}
-	if (level & F_RSRT)
-		return -res;
-	return res;
+	return (res);
 }
 
-static nm_sym_node_t *merge_sorted_lists(nm_sym_node_t *a, nm_sym_node_t *b, int level)
+static int
+cmp_sym(const nm_sym_node_t *a, const nm_sym_node_t *b, int level)
 {
-	if (!a) return b;
-	if (!b) return a;
+	int res;
+
+	if (level & F_ASRT)
+	{
+		res = cmp_sym_num(a, b);
+		if (res == 0)
+		{
+			res = cmp_sym_name(a, b);
+		}
+	}
+	else
+	{
+		res = cmp_sym_name(a, b);
+	}
+	
+	if (level & F_RSRT)
+		return (-res);
+	return (res);
+}
+
+static nm_sym_node_t*
+merge_sorted_lists(nm_sym_node_t *a, nm_sym_node_t *b, int level)
+{
+	if (!a) return (b);
+	if (!b) return (a);
 
 	nm_sym_node_t *result = NULL;
 
-	if (cmp_sym(a, b, level) <= 0) {
+	if (cmp_sym(a, b, level) <= 0)
+	{
 		result = a;
 		result->next = merge_sorted_lists(a->next, b, level);
-	} else {
+	}
+	else
+	{
 		result = b;
 		result->next = merge_sorted_lists(a, b->next, level);
 	}
-	return result;
+	return (result);
 }
 
-static void split_list(nm_sym_node_t *source, nm_sym_node_t **front, nm_sym_node_t **back)
+static void
+split_list(nm_sym_node_t *source, nm_sym_node_t **front, nm_sym_node_t **back)
 {
 	nm_sym_node_t *slow = source;
 	nm_sym_node_t *fast = source->next;
 
-	while (fast) {
+	while (fast)
+	{
 		fast = fast->next;
-		if (fast) {
+		if (fast)
+		{
 			slow = slow->next;
 			fast = fast->next;
 		}
@@ -133,10 +162,11 @@ static void split_list(nm_sym_node_t *source, nm_sym_node_t **front, nm_sym_node
 	slow->next = NULL;
 }
 
-static nm_sym_node_t *merge_sort(nm_sym_node_t *head, int level)
+static nm_sym_node_t*
+merge_sort(nm_sym_node_t *head, int level)
 {
 	if (!head || !head->next)
-		return head;
+		return (head);
 
 	nm_sym_node_t *left = NULL;
 	nm_sym_node_t *right = NULL;
@@ -165,8 +195,8 @@ static char
 format_on_linkage_scope(char base, int global)
 {
 	if (global)
-		return base - 32;
-	return base;
+		return (base - 32);
+	return (base);
 }
 
 static char
@@ -242,11 +272,13 @@ get_version_name(uint16_t ndx, t_elf_section *verneed_section, char *verstrtab)
 	uint8_t *data = verneed_section->data;
 	size_t offset = 0;
 
-	while (offset < verneed_section->sh_size) {
+	while (offset < verneed_section->sh_size)
+	{
 		t_elf_verneed *vern = (t_elf_verneed *)(data + offset);
 		size_t aux_offset = offset + vern->vn_aux;
 
-		for (int i = 0; i < vern->vn_cnt; i++) {
+		for (int i = 0; i < vern->vn_cnt; i++)
+		{
 			t_elf_vernaux *aux = (t_elf_vernaux *)(data + aux_offset);
 			if (aux->vna_other == ndx)
 				return verstrtab + aux->vna_name;
@@ -266,8 +298,10 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 	t_elf_section *verneed_section = NULL;
 	char *verstrtab = NULL;
 
-	if (level & F_DYNS) {
-		for (size_t i = 0; all_sections[i].sh_name != NULL; i++) {
+	if (level & F_DYNS)
+	{
+		for (size_t i = 0; all_sections[i].sh_name != NULL; i++)
+		{
 			if (all_sections[i].sh_type == SHT_GNU_versym &&
 				ft_strcmp(all_sections[i].sh_name, ".gnu.version") == 0)
 				versym = (uint16_t *)all_sections[i].data;
@@ -286,7 +320,8 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 	nm_sym_node_t* first_node = NULL;
 	nm_sym_node_t* last_node = NULL;
 
-	for (size_t j = 0; j * sizeof(t_elf_sym) < sym_section->sh_size; j++) {
+	for (size_t j = 0; j * sizeof(t_elf_sym) < sym_section->sh_size; j++)
+	{
 		void *absoffset = sym_section->data + j * sizeof(t_elf_sym);
 		ft_memmove(&sym, absoffset, sizeof(sym));
 
@@ -298,12 +333,17 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 			if (sym.st_shndx != SHN_UNDEF)
 				continue;
 		}
-		else if (level & F_EXTO)
+		if (level & F_DFNO)
+		{
+			if (sym.st_shndx == SHN_UNDEF)
+				continue;
+		}
+		if (level & F_EXTO)
 		{
 			if (bind != STB_GLOBAL && bind != STB_WEAK && bind != STB_LOOS && bind != STB_HIOS)
 				continue;
 		}
-		else if (!(level & F_ALL))
+		if (!(level & F_ALL))
 		{
 			if (stype == STT_SECTION || stype == STT_FILE)
 				continue;
@@ -318,8 +358,8 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 		{
 			name = (char *)symstr_section->data + sym.st_name;
 		}
-		if (!name || !*name) {
-			// Ignore symboles sans nom sauf si c'est un STT_FILE (tu peux ajouter ce test)
+		if (!name || !*name)
+		{
 			if (stype != STT_FILE)
 				continue;
 		}
@@ -333,9 +373,12 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 			return (NULL);
 		}
 
-		if (first_node == NULL) {
+		if (first_node == NULL)
+		{
 			first_node = node;
-		} else {
+		}
+		else
+		{
 			last_node->next = node;
 		}
 		last_node = node;
@@ -347,7 +390,8 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 		node->value = sym.st_value;
 		node->type = type;
 
-		if ((level & F_DYNS) && versym) {
+		if ((level & F_DYNS) && versym)
+		{
 			uint16_t ndx = versym[j] & 0x7fff;
 			node->version = get_version_name(ndx, verneed_section, verstrtab);
 		}
@@ -361,7 +405,8 @@ get_symbol_indexes(t_elf_file *elf_file, int level, int* symtab, int* symstr)
 {
 	if (level & F_DYNS)
 	{
-		for (uint16_t i = 0; i < elf_file->e_shnum; i++) {
+		for (uint16_t i = 0; i < elf_file->e_shnum; i++)
+		{
 			if (ft_strcmp(elf_file->section_tables[i].sh_name, ".dynsym") == 0 && elf_file->section_tables[i].sh_type == SHT_DYNSYM)
 				*symtab = i;
 			else if (ft_strcmp(elf_file->section_tables[i].sh_name, ".dynstr") == 0 && elf_file->section_tables[i].sh_type == SHT_STRTAB)
@@ -370,7 +415,8 @@ get_symbol_indexes(t_elf_file *elf_file, int level, int* symtab, int* symstr)
 	}
 	else
 	{
-		for (uint16_t i = 0; i < elf_file->e_shnum; i++) {
+		for (uint16_t i = 0; i < elf_file->e_shnum; i++)
+		{
 			if (ft_strcmp(elf_file->section_tables[i].sh_name, ".symtab") == 0 && elf_file->section_tables[i].sh_type == SHT_SYMTAB)
 				*symtab = i;
 			else if (ft_strcmp(elf_file->section_tables[i].sh_name, ".strtab") == 0 && elf_file->section_tables[i].sh_type == SHT_STRTAB)
@@ -406,10 +452,25 @@ print_sym(t_elf_file *elf_file, int level)
 
 	sort_nodes(&nodes, level);
 
+	char printr[16];
+	switch (F_RADIX(level))
+	{
+	case F_RDX_DEC:
+		ft_strlcpy(printr, "%016ld ", sizeof(printr));
+		break;
+	case F_RDX_OCT:
+		ft_strlcpy(printr, "%016lo ", sizeof(printr));
+		break;
+	case F_RDX_HEX:
+	default:
+		ft_strlcpy(printr, "%016lx ", sizeof(printr));
+		break;
+	}
+
 	for (nm_sym_node_t* node = nodes; node != NULL; node = node->next)
 	{
 		if (node->has_ndx)
-			ft_verbose("%016lx ", node->value);
+			ft_verbose(printr, node->value);
 		else
 			ft_verbose("                 ");
 

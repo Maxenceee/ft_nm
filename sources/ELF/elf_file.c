@@ -100,11 +100,13 @@ get_elf_tables_offset(t_elf_file *elf_file, t_binary_reader *reader)
 	size_t elf_section_data_size;
 	for (int i = 0; i < elf_file->e_shnum; i++)
 	{
-		if (elf_file->section_tables[i].sh_type != SHT_NOBITS) {
+		if (elf_file->section_tables[i].sh_type != SHT_NOBITS)
+		{
 			elf_section_data_size = elf_file->section_tables[i].sh_size;
 
 			elf_file->section_tables[i].data = malloc(elf_section_data_size);
-			if (elf_file->section_tables[i].data == NULL) {
+			if (elf_file->section_tables[i].data == NULL)
+			{
 				return (ft_dverbose(STDERR_FILENO, "Could not allocate memory\n"), -1);
 			}
 

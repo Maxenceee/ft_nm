@@ -1,8 +1,32 @@
 #!/bin/bash
 echo -e "${YELLOW}Starting ft_nm vs nm comparison tests...${NC}"
 
-BIN=("btc" "marvin_game" "rpn" "taskmasterd" "woody" "famine" "PmergeMe" "target" "webserv" "woody_woodpacker")
-FLAGS=("" "-a" "-g" "-u" "-D" "-p" "-r")
+BIN=(
+	"btc"
+	"marvin_game"
+	"rpn"
+	"taskmasterd"
+	"woody"
+	"famine"
+	"PmergeMe"
+	"target"
+	"webserv"
+	"woody_woodpacker"
+)
+FLAGS=(
+	""
+	"-a"
+	"-g"
+	"-u"
+	"-D"
+	"-p"
+	"-r"
+	"-U"
+	"-n"
+	"-to"
+	"-tx"
+	"-td"
+)
 
 OUTDIR=test_res
 

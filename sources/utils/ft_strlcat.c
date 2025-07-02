@@ -1,35 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlcpy.c                                       :+:      :+:    :+:   */
+/*   ft_strlcat.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/07 14:00:27 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/02 16:38:37 by mgama            ###   ########.fr       */
+/*   Created: 2025/07/02 16:33:15 by mgama             #+#    #+#             */
+/*   Updated: 2025/07/02 16:39:46 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "utils.h"
 
-uint32_t	ft_strlcpy(char *dest, const char *src, uint32_t size)
+uint32_t	ft_strlcat(char *dest, const char *src, uint32_t size)
 {
-	uint32_t	i;
+	char	*d;
+	const char	*s;
+	int		n;
+	int		dlen;
 
-	if (!dest || !src)
-		return (0);
-
-	i = 0;
-	if (size != 0)
+	d = dest;
+	s = src;
+	n = size;
+	while (n-- != 0 && *d != '\0')
+		d++;
+	dlen = d - dest;
+	n = size - dlen;
+	if (n == 0)
+		return (dlen + (uint32_t)ft_strlen(s));
+	while (*s != '\0')
 	{
-		while (i < size - 1 && src[i] != '\0')
+		if (n != 1)
 		{
-			dest[i] = src[i];
-			i++;
+			*d++ = *s;
+			n--;
 		}
-		dest[i] = '\0';
+		s++;
 	}
-	while (src[i] != '\0')
-		i++;
-	return (i);
+	*d = '\0';
+	return (dlen + (s - src));
 }

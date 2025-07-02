@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/20 21:42:23 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/01 18:14:24 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/02 16:33:51 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,6 +281,28 @@ ft_switch_types(int fd, const char *fmt, va_list *argp, t_format_opts *opts)
 			ft_putnbr_base_padded(fd, va_arg(*argp, unsigned long), 0, 10, opts->width, opts->zero_pad);
 		else
 			ft_putnbr_base(fd, va_arg(*argp, unsigned long), 0, 10);
+		if (verbose_mode & VERBOSE_COLOR)
+			ft_putstr(fd, RESET);
+		break;
+	case 'o':
+		if (verbose_mode & VERBOSE_COLOR)
+			ft_putstr(fd, B_CYAN);
+		if (opts->hex)
+			ft_putstr(fd, "0");
+		if (opts->is_long_long)
+		{
+			if (opts->width > 0)
+				ft_putnbr_base_64_padded(fd, va_arg(*argp, uint64_t), 0, 8, opts->width, opts->zero_pad);
+			else
+				ft_putnbr_base_64(fd, va_arg(*argp, uint64_t), 0, 8);
+		}
+		else
+		{
+			if (opts->width > 0)
+				ft_putnbr_base_padded(fd, va_arg(*argp, uint32_t), 0, 8, opts->width, opts->zero_pad);
+			else
+				ft_putnbr_base(fd, va_arg(*argp, uint32_t), 0, 8);
+		}
 		if (verbose_mode & VERBOSE_COLOR)
 			ft_putstr(fd, RESET);
 		break;
