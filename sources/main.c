@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:36:24 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/02 17:05:25 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/02 17:16:27 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,18 @@ static void	usage(void)
 	(void)ft_dverbose(STDERR_FILENO, "%s\n", "usage: ft_nm <option(s)> file");
 	(void)ft_dverbose(STDERR_FILENO, "  %s\n", "Options are:");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-a", "--debug-syms", "Show all symbols, even debugger only");
-	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-g", "--extern-only", "Show only external symbols");
-	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-u", "--undefined-only", "Show only undefined symbols");
-	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-U", "--defined-only", "Show only defined symbols");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-d", "--debug", "Display debug information");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-D", "--dynamic", "Display dynamic symbols instead of normal symbols");
-	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-W", "--no-weak", "Show only non-weak symbols");
-	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-r", "--reverse-sort", "Sort in reverse order");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-g", "--extern-only", "Show only external symbols");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-h", "--help", "Display this help");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-n", "--numeric-sort", "Sort symbols by address");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-p", "--no-sort", "Show symbols in order encountered");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-r", "--reverse-sort", "Sort in reverse order");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-t", "--radix=<radix>", "Radix (o/d/x) for printing symbol Values");
-	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-h", "--help", "Display this help");
-	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-d", "--debug", "Display debug information");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-U", "--defined-only", "Show only defined symbols");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-u", "--undefined-only", "Show only undefined symbols");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-v", "--version", "Display the version");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-W", "--no-weak", "Show only non-weak symbols");
 }
 
 int
@@ -39,18 +39,18 @@ main(int ac, char** av)
 
 	struct getopt_list_s optlist[] = {
 		{"debug-syms", 'a', OPTPARSE_NONE},
-		{"extern-only", 'g', OPTPARSE_NONE},
-		{"undefined-only", 'u', OPTPARSE_NONE},
-		{"defined-only", 'U', OPTPARSE_NONE},
+		{"debug", 'd', OPTPARSE_NONE},
 		{"dynamic", 'D', OPTPARSE_NONE},
-		{"no-weak", 'W', OPTPARSE_NONE},
-		{"reverse-sort", 'r', OPTPARSE_NONE},
+		{"extern-only", 'g', OPTPARSE_NONE},
+		{"help", 'h', OPTPARSE_NONE},
 		{"numeric-sort", 'n', OPTPARSE_NONE},
 		{"no-sort", 'p', OPTPARSE_NONE},
+		{"reverse-sort", 'r', OPTPARSE_NONE},
 		{"radix", 't', OPTPARSE_REQUIRED},
-		{"help", 'h', OPTPARSE_NONE},
-		{"debug", 'd', OPTPARSE_NONE},
+		{"defined-only", 'U', OPTPARSE_NONE},
+		{"undefined-only", 'u', OPTPARSE_NONE},
 		{"version", 'v', OPTPARSE_NONE},
+		{"no-weak", 'W', OPTPARSE_NONE},
 		{0}
 	};
 	struct getopt_s options;
