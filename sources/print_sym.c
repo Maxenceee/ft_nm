@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 18:58:37 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/02 16:57:57 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/02 17:06:51 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -341,6 +341,11 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 		if (level & F_EXTO)
 		{
 			if (bind != STB_GLOBAL && bind != STB_WEAK && bind != STB_LOOS && bind != STB_HIOS)
+				continue;
+		}
+		if (level & F_NWKS)
+		{
+			if (bind == STB_WEAK)
 				continue;
 		}
 		if (!(level & F_ALL))

@@ -26,6 +26,7 @@ FLAGS=(
 	"-to"
 	"-tx"
 	"-td"
+	"-W"
 )
 
 OUTDIR=test_res
@@ -38,34 +39,25 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
+total_tests=0
 for T in "${BIN[@]}"; do
-	TARGET=./targets/$T
-	for F in "${FLAGS[@]}"; do
-		echo -e "${YELLOW}Testing $T with flag '$F'...${NC}"
-		./ft_nm $F "$TARGET" 2>&1 > $OUTDIR/out.f
-		nm $F "$TARGET" 2>&1 > $OUTDIR/out.m
-
-		diff $OUTDIR/out.f $OUTDIR/out.m > $OUTDIR/out.diff
-		if [ $? -ne 0 ]; then
-			echo -e "${RED}Difference found for $T with flag '$F':${NC}"
-			echo -e "./ft_nm $F "$TARGET" 2>&1 > $OUTDIR/out.f"
-			cat $OUTDIR/out.diff
-			cp $OUTDIR/out.f "$OUTDIR/out_${T}_flag_${F// /_}.ftnm"
-			cp $OUTDIR/out.m "$OUTDIR/out_${T}_flag_${F// /_}.nm"
-		else
-			echo -e "${GREEN}No difference for $T with flag '$F'${NC}"
-		fi
+	for F1 in "${FLAGS[@]}"; do
+		for F2 in "${FLAGS[@]}"; do
+			if [ "$F1" != "$F2" ]; then
+				((total_tests++))
+			fi
+		done
 	done
 done
 
-# Mix all combinations of two flags
+current_test=1
 for T in "${BIN[@]}"; do
 	TARGET=./targets/$T
 	for F1 in "${FLAGS[@]}"; do
 		for F2 in "${FLAGS[@]}"; do
 			if [ "$F1" != "$F2" ]; then
 				COMBO="$F1 $F2"
-				echo -e "${YELLOW}Testing $T with flags '$COMBO'...${NC}"
+				echo -e "${YELLOW}[$current_test/$total_tests] Testing $T with flags '$COMBO'...${NC}"
 				./ft_nm $COMBO "$TARGET" 2>&1 > $OUTDIR/out.f
 				nm $COMBO "$TARGET" 2>&1 > $OUTDIR/out.m
 
@@ -79,6 +71,7 @@ for T in "${BIN[@]}"; do
 				else
 					echo -e "${GREEN}No difference for $T with flags '$COMBO'${NC}"
 				fi
+				((current_test++))
 			fi
 		done
 	done

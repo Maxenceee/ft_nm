@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:36:24 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/02 17:02:10 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/02 17:05:25 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ static void	usage(void)
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-u", "--undefined-only", "Show only undefined symbols");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-U", "--defined-only", "Show only defined symbols");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-D", "--dynamic", "Display dynamic symbols instead of normal symbols");
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-W", "--no-weak", "Show only non-weak symbols");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-r", "--reverse-sort", "Sort in reverse order");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-n", "--numeric-sort", "Sort symbols by address");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-p", "--no-sort", "Show symbols in order encountered");
@@ -42,6 +43,7 @@ main(int ac, char** av)
 		{"undefined-only", 'u', OPTPARSE_NONE},
 		{"defined-only", 'U', OPTPARSE_NONE},
 		{"dynamic", 'D', OPTPARSE_NONE},
+		{"no-weak", 'W', OPTPARSE_NONE},
 		{"reverse-sort", 'r', OPTPARSE_NONE},
 		{"numeric-sort", 'n', OPTPARSE_NONE},
 		{"no-sort", 'p', OPTPARSE_NONE},
@@ -71,6 +73,9 @@ main(int ac, char** av)
 				break;
 			case 'U':
 				option |= F_DFNO;
+				break;
+			case 'W':
+				option |= F_NWKS;
 				break;
 			case 'r':
 				option |= F_RSRT;

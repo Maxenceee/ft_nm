@@ -6,7 +6,7 @@
 /*   By: mgama <mgama@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:38:16 by mgama             #+#    #+#             */
-/*   Updated: 2025/07/02 16:44:08 by mgama            ###   ########.fr       */
+/*   Updated: 2025/07/02 17:05:10 by mgama            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 #define F_UNDO		0x00000040
 #define F_DFNO		0x00000080
 #define F_DYNS		0x00000100
+#define F_NWKS		0x00000200
 
 #define F_RSRT		0x00001000
 #define F_NSRT		0x00002000
