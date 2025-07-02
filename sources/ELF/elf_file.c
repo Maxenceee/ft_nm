@@ -150,14 +150,14 @@ new_elf_file(t_binary_reader *reader)
 	}
 	ft_bverbose("Class: %s%s%s\n", B_CYAN, elf_file->e_ident.ei_class == ELF_32BITS ? "32 bits" : "64 bits", RESET);
 
-#if 1
 	ft_bverbose("\nReading ELF endianness...\n");
+#if 1
 	if (elf_file->e_ident.ei_data == READER_BIG_ENDIAN)
 	{
 		reader->set_endian(reader, READER_BIG_ENDIAN);
 	}
-	ft_bverbose("Endianness: %s\n", elf_file->e_ident.ei_data == READER_BIG_ENDIAN ? B_BLUE"Big"RESET : B_CYAN"Little"RESET);
 #endif
+	ft_bverbose("Endianness: %s\n", elf_file->e_ident.ei_data == READER_BIG_ENDIAN ? B_BLUE"Big"RESET : B_CYAN"Little"RESET);
 #if 0
 	/**
 	 * INFO:
