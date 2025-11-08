@@ -21,8 +21,6 @@ BLUE			=	\033[1;34m
 RED				=	\033[1;31m
 YELLOW			=	\033[1;33m
 DEFAULT			=	\033[0m
-HEADER			=	"\033[1;38;5;216m"
-HACKER			=	"\033[1;5;38;5;40m"
 UP				=	"\033[A"
 CUT				=	"\033[K"
 
@@ -32,7 +30,7 @@ $(OBJ_DIR)/%.o: $(MANDATORY_DIR)/%.c
 	@$(CC) $(CFLAGS) $(DEPSFLAG) -c $< -o $@
 	@printf ${UP}${CUT}
 
-all: header $(NAME)
+all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CC) $(CFLAGS) $^ -o $(NAME)
@@ -50,19 +48,4 @@ fclean: clean
 
 re: fclean all
 
-header:
-	@echo $(HEADER)
-	@echo "              .~~~.         ,,"
-	@echo "   ,,        /     \       ;,,'"
-	@echo "  ;, ;      (  -  - )      ; ;"
-	@echo "    ;,';,,,  \  \/ /      ,; ;"
-	@echo " ,,,  ;,,,,;;,\`   '-,;'''',,,'"
-	@echo ";,, ;,, ,,,,   ,;  ,,,'';;,,;''';"
-	@echo "   ;,,,;    ~~'  '';,,''',,;''''"
-	@echo "                      '''"
-	@echo -n "             "
-	@echo $(HACKER) $(NAME)
-	@echo "$(DEFAULT)"
-
-
-.PHONY: all clean fclean re header
+.PHONY: all clean fclean re
