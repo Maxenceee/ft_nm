@@ -69,12 +69,12 @@ nm(const char *filename, int option)
 	case 1:
 		return (1);
 	}
+	return (0);
 }
 
 int
 main(int ac, char** av)
 {
-	char *target = "./a.out";
 	int ch, option = 0;
 
 	struct getopt_list_s optlist[] = {
@@ -187,17 +187,19 @@ main(int ac, char** av)
 		}
 	}
 
+	int res = 0;
 	if (ac - options.optind == 0)
 	{
-		nm(target, option);
+		res = nm("./a.out", option);
 	}
 	else
 	{
 		for (int i = options.optind; i < ac; i++)
 		{
-			nm(av[i], option);
+			ft_verbose("\n%s:\n", av[i]);
+			res = ft_max(res, nm(av[i], option));
 		}
 	}
 
-	return (0);
+	return (res);
 }
