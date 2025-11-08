@@ -65,7 +65,6 @@ typedef struct nm_sym_s
 	struct nm_sym_s *next;
 }	nm_sym_node_t;
 
-
 /**
  * ELF
  */
