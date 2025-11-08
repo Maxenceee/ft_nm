@@ -27,16 +27,54 @@ static void	usage(void)
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-t", "--radix=<radix>", "Radix (o/d/x) for printing symbol Values");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-U", "--defined-only", "Show only defined symbols");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-u", "--undefined-only", "Show only undefined symbols");
+#ifndef __APPLE__
+	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-V", "--version", "Display the version");
+#else
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-v", "--version", "Display the version");
-#ifdef __APPLE__
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-W", "--no-weak", "Show only non-weak symbols");
 #endif /* __APPLE__ */
 }
 
 int
+nm(const char *filename, int option)
+{
+	int fd = open(filename, O_RDONLY);
+	if (fd == -1)
+	{
+		ft_dverbose(STDERR_FILENO, NM_PREFIX"Cannot open file: %s\n", filename);
+		return (1);
+	}
+
+	t_binary_reader *reader = new_binary_reader(fd);
+	close(fd);
+	if (!reader)
+	{
+		ft_dverbose(STDERR_FILENO, NM_PREFIX"Cannot read file: %s\n", filename);
+		return (1);
+	}
+
+	t_elf_file *elf_file = new_elf_file(reader);
+	if (elf_file == NULL)
+	{
+		ft_dverbose(STDERR_FILENO, NM_PREFIX"The file was not recognized as a valid object file\n");
+		delete_binary_reader(reader);
+		return (1);
+	}
+
+	switch (print_sym(elf_file, option))
+	{
+	case 2:
+		ft_dverbose(STDERR_FILENO, NM_PREFIX"%s: no symbols\n", filename);
+		break;
+	case 1:
+		return (1);
+	}
+}
+
+int
 main(int ac, char** av)
 {
-	char *target;
+	char *target = "./a.out";
 	int ch, option = 0;
 
 	struct getopt_list_s optlist[] = {
@@ -51,7 +89,13 @@ main(int ac, char** av)
 		{"radix", 't', OPTPARSE_REQUIRED},
 		{"defined-only", 'U', OPTPARSE_NONE},
 		{"undefined-only", 'u', OPTPARSE_NONE},
-		{"version", 'v', OPTPARSE_NONE},
+		{"version",
+#ifdef __APPLE__
+			'v',
+#else
+			'V',
+#endif /* __APPLE__ */
+			OPTPARSE_NONE},
 #ifdef __APPLE__
 		{"no-weak", 'W', OPTPARSE_NONE},
 #endif /* __APPLE__ */
@@ -129,7 +173,11 @@ main(int ac, char** av)
 			case 'd':
 				ft_verbose_mode(VERBOSE_INFO | VERBOSE_DEBUG | VERBOSE_COLOR);
 				break;
+#ifdef __APPLE__
 			case 'v':
+#else
+			case 'V':
+#endif /* __APPLE__ */
 				ft_verbose(B_PINK"ft_nm version %s%s%s by %s%s%s\n"RESET, CYAN, NM_VERSION, B_PINK, CYAN, NM_AUTHOR, RESET);
 				return (0);
 			case 'h':
@@ -139,43 +187,17 @@ main(int ac, char** av)
 		}
 	}
 
-	if (ac - options.optind != 1)
+	if (ac - options.optind == 0)
 	{
-		usage();
-		return (64);
+		nm(target, option);
 	}
-	target = av[options.optind];
-
-	int fd = open(target, O_RDONLY);
-	if (fd == -1)
+	else
 	{
-		ft_dverbose(STDERR_FILENO, NM_PREFIX"Cannot open file: %s\n", target);
-		return (1);
+		for (int i = options.optind; i < ac; i++)
+		{
+			nm(av[i], option);
+		}
 	}
 
-	t_binary_reader *reader = new_binary_reader(fd);
-	close(fd);
-	if (!reader)
-	{
-		ft_dverbose(STDERR_FILENO, NM_PREFIX"Cannot read file: %s\n", target);
-		return (1);
-	}
-
-	t_elf_file *elf_file = new_elf_file(reader);
-	if (elf_file == NULL)
-	{
-		ft_dverbose(STDERR_FILENO, NM_PREFIX"The file was not recognized as a valid object file\n");
-		delete_binary_reader(reader);
-		return (1);
-	}
-
-	switch (print_sym(elf_file, option))
-	{
-	case 2:
-		ft_dverbose(STDERR_FILENO, NM_PREFIX"%s: no symbols\n", target);
-		break;
-	case 1:
-		return (1);
-	}
 	return (0);
 }

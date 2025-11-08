@@ -20,7 +20,7 @@
 #include "verbose.h"
 #include "reader/binary_reader.h"
 
-#define NM_VERSION "1.0"
+#define NM_VERSION "1.5"
 #define NM_AUTHOR "mgama"
 
 #ifdef __APPLE__
