@@ -52,7 +52,7 @@
 
 #define F_RADIX(r) (r & F_RDX_MASK)
 
-int		print_sym(t_elf_file *elf_file, int level);
+int		print_sym(void *elf_file, int level);
 
 typedef struct nm_sym_s
 {
@@ -70,8 +70,9 @@ typedef struct nm_sym_s
  * ELF
  */
 
-void		delete_elf_file(t_elf_file *elf_file);
-t_elf_file*	new_elf_file(t_binary_reader *reader);
+ void		delete_elf64_file(t_elf64_file *elf_file);
+void		delete_elf32_file(t_elf32_file *elf_file);
+void*		new_elf_file(t_binary_reader *reader);
 
 /**
  * For dev only
@@ -85,7 +86,7 @@ t_elf_file*	new_elf_file(t_binary_reader *reader);
 #define PELF_DATA		0x20
 #define PELF_ERROR		0x80
 
-void	print_elf_file(t_elf_file *elf_file, int level);
+void	print_elf_file(void *elf_file, int level);
 
 #ifdef __APPLE__
 

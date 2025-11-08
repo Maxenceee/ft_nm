@@ -64,14 +64,26 @@ typedef struct
 	uint64_t	p_filesz;
 	uint64_t	p_memsz;
 	uint64_t	p_align;
-} t_elf_program_header;
+} t_elf64_program_header;
+
+typedef struct
+{
+	uint32_t p_type;
+	uint32_t p_offset;
+	uint32_t p_vaddr;
+	uint32_t p_paddr;
+	uint32_t p_filesz;
+	uint32_t p_memsz;
+	uint32_t p_flags;
+	uint32_t p_align;
+} t_elf32_program_header;
 
 typedef struct
 {
 	uint32_t	sh_name_offset;
 	uint32_t	sh_type;
 	uint64_t	sh_flags;
-	uint64_t	sh_address;
+	uint64_t	sh_addr;
 	uint64_t	sh_offset;
 	uint64_t	sh_size;
 	uint32_t	sh_link;
@@ -80,7 +92,24 @@ typedef struct
 	uint64_t	sh_entsize;
 	uint8_t		*data;
 	char		*sh_name;
-} t_elf_section;
+} t_elf64_section_header;
+
+typedef struct
+{
+	uint32_t	sh_name_offset;
+	uint32_t	sh_type;
+	uint32_t	sh_flags;
+	uint32_t	sh_addr;
+	uint32_t	sh_offset;
+	uint32_t	sh_size;
+	uint32_t	sh_link;
+	uint32_t	sh_info;
+	uint32_t	sh_addralign;
+	uint32_t	sh_entsize;
+	uint8_t		*data;
+	char		*sh_name;
+} t_elf32_section_header;
+
 
 #define SHT_NULL			0		/* Section header table entry unused */
 #define SHT_PROGBITS		1		/* Program data */
@@ -138,8 +167,7 @@ typedef struct
 #define PF_MASKOS	0x0ff00000	/* OS-specific */
 #define PF_MASKPROC	0xf0000000	/* Processor-specific */
 
-typedef 
-struct
+typedef struct
 {
 	uint32_t	st_name;
 	uint8_t		st_info;
@@ -147,7 +175,17 @@ struct
 	uint16_t	st_shndx;
 	uint64_t	st_value;
 	uint64_t	st_size;
-} t_elf_sym;
+} t_elf64_sym;
+
+typedef struct
+{
+	uint32_t st_name;
+	uint32_t st_value;
+	uint32_t st_size;
+	uint8_t  st_info;
+	uint8_t  st_other;
+	uint16_t st_shndx;
+} t_elf32_sym;
 
 typedef struct
 {
@@ -230,8 +268,7 @@ typedef union
 	uint8_t raw[16];
 } t_elf_ident;
 
-typedef struct
-{
+typedef struct {
 	t_elf_ident	e_ident;
 	uint16_t	e_type;						// object type
 	uint16_t	e_machine;					// machine type
@@ -246,13 +283,38 @@ typedef struct
 	uint16_t	e_shentsize;				// size of single section header
 	uint16_t	e_shnum; 					// count of section headers
 	uint16_t	e_shstrndx;					// index of name's section in the table
-	t_elf_program_header	*program_headers;
-	t_elf_section			*section_tables;
-}	t_elf_file;
 
-#define ELF_HEADER_SIZE (sizeof(t_elf_file) - sizeof(t_elf_program_header *) - sizeof(t_elf_section *))
-#define ELF_PROGRAM_HEADER_SIZE sizeof(t_elf_program_header)
-#define ELF_SECTION_HEADER_SIZE (sizeof(t_elf_section) - sizeof(char *) - sizeof(uint8_t *))
+	t_elf64_program_header	*ph64;
+	t_elf64_section_header	*sh64;
+} t_elf64_file;
+
+typedef struct {
+	t_elf_ident	e_ident;
+	uint16_t e_type;            			// Object file type
+	uint16_t e_machine;         			// Machine type
+	uint32_t e_version;         			// Object file version
+	uint32_t e_entry;           			// Entry point address
+	uint32_t e_phoff;           			// Program header offset
+	uint32_t e_shoff;           			// Section header offset
+	uint32_t e_flags;           			// Processor-specific flags
+	uint16_t e_ehsize;          			// ELF header size
+	uint16_t e_phentsize;       			// Size of program header entry
+	uint16_t e_phnum;           			// Number of program header entries
+	uint16_t e_shentsize;       			// Size of section header entry
+	uint16_t e_shnum;           			// Number of section header entries
+	uint16_t e_shstrndx;        			// Section name string table index
+
+	t_elf32_program_header	*ph32;
+	t_elf32_section_header	*sh32;
+} t_elf32_file;
+
+#define ELF64_HEADER_SIZE (sizeof(t_elf64_file) - sizeof(t_elf64_program_header *) - sizeof(t_elf64_section_header *))
+#define ELF64_PROGRAM_HEADER_SIZE sizeof(t_elf64_program_header)
+#define ELF64_SECTION_HEADER_SIZE (sizeof(t_elf64_section_header) - sizeof(char *) - sizeof(uint8_t *))
+
+#define ELF32_HEADER_SIZE (sizeof(t_elf32_file) - sizeof(t_elf32_program_header *) - sizeof(t_elf32_section_header *))
+#define ELF32_PROGRAM_HEADER_SIZE sizeof(t_elf32_program_header)
+#define ELF32_SECTION_HEADER_SIZE (sizeof(t_elf32_section_header) - sizeof(char *) - sizeof(uint8_t *))
 
 #define ELF_MAGIC 0x7F454C46
 

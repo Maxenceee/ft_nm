@@ -203,7 +203,7 @@ format_on_linkage_scope(char base, int global)
 }
 
 static char
-get_elf_sym_type(t_elf_sym *sym, t_elf_section *all_sections)
+get_elf_sym_type(t_elf64_sym *sym, t_elf64_section *all_sections)
 {
 	uint8_t type = ELF64_ST_TYPE(sym->st_info);
 	uint8_t bind = ELF64_ST_BIND(sym->st_info);
@@ -238,7 +238,7 @@ get_elf_sym_type(t_elf_sym *sym, t_elf_section *all_sections)
 		return 'u';
 	}
 
-	t_elf_section *sec = &all_sections[ndx];
+	t_elf64_section *sec = &all_sections[ndx];
 	const char *secname = sec->sh_name;
 
 	if (ft_strncmp(secname, ".debug_", 7) == 0 || ft_strncmp(secname, ".zdebug_", 8) == 0)
@@ -267,7 +267,7 @@ get_elf_sym_type(t_elf_sym *sym, t_elf_section *all_sections)
 }
 
 static char *
-get_version_name(uint16_t ndx, t_elf_section *verneed_section, char *verstrtab)
+get_version_name(uint16_t ndx, t_elf64_section *verneed_section, char *verstrtab)
 {
 	if (!verneed_section || !verstrtab || ndx <= 1)
 		return NULL;
@@ -295,10 +295,10 @@ get_version_name(uint16_t ndx, t_elf_section *verneed_section, char *verstrtab)
 }
 
 static nm_sym_node_t*
-print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_section *all_sections, int level)
+print_elf_sym(t_elf64_section *sym_section, t_elf64_section *symstr_section, t_elf64_section *all_sections, int level)
 {
 	uint16_t *versym = NULL;
-	t_elf_section *verneed_section = NULL;
+	t_elf64_section *verneed_section = NULL;
 	char *verstrtab = NULL;
 
 	if (level & F_DYNS)
@@ -319,13 +319,13 @@ print_elf_sym(t_elf_section *sym_section, t_elf_section *symstr_section, t_elf_s
 		}
 	}
 
-	t_elf_sym sym;
+	t_elf64_sym sym;
 	nm_sym_node_t* first_node = NULL;
 	nm_sym_node_t* last_node = NULL;
 
-	for (size_t j = 0; j * sizeof(t_elf_sym) < sym_section->sh_size; j++)
+	for (size_t j = 0; j * sizeof(t_elf64_sym) < sym_section->sh_size; j++)
 	{
-		void *absoffset = sym_section->data + j * sizeof(t_elf_sym);
+		void *absoffset = sym_section->data + j * sizeof(t_elf64_sym);
 		ft_memmove(&sym, absoffset, sizeof(sym));
 
 		uint8_t stype = ELF64_ST_TYPE(sym.st_info);
@@ -448,7 +448,7 @@ print_sym(t_elf_file *elf_file, int level)
 		return (2);
 	}
 
-	ft_bverbose("Symbol table found and contains %u entries\n", elf_file->section_tables[symtab_idx].sh_size / sizeof(t_elf_sym));
+	ft_bverbose("Symbol table found and contains %u entries\n", elf_file->section_tables[symtab_idx].sh_size / sizeof(t_elf64_sym));
 
 	nm_sym_node_t* nodes = print_elf_sym(&elf_file->section_tables[symtab_idx], &elf_file->section_tables[symstr_idx], elf_file->section_tables, level);
 	if (!nodes)

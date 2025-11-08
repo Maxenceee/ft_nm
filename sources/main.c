@@ -196,7 +196,8 @@ main(int ac, char** av)
 	{
 		for (int i = options.optind; i < ac; i++)
 		{
-			ft_verbose("\n%s:\n", av[i]);
+			if (ac - options.optind > 1)
+				ft_verbose("\n%s:\n", av[i]);
 			res = ft_max(res, nm(av[i], option));
 		}
 	}

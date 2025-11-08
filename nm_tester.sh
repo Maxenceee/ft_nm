@@ -6,12 +6,12 @@ BIN=(
 	"marvin_game"
 	# "rpn"
 	# "taskmasterd"
-	# "woody"
-	# "famine"
+	"woody"
+	"famine"
 	# "PmergeMe"
 	# "target"
 	# "webserv"
-	# "woody_woodpacker"
+	"woody_woodpacker"
 )
 FLAGS=(
 	""
