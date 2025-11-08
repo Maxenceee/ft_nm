@@ -79,6 +79,42 @@ get_elf64_section_headers(t_elf64_file *elf_file, t_binary_reader *reader)
 	}
 
 	ft_bverbose("Section table contains %d entries\n", elf_file->e_shnum);
+
+	if (elf_file->e_shstrndx > 0)
+	{
+		ft_bverbose("String table found at index: %d\n", elf_file->e_shstrndx);
+		for (int i = 0; i < elf_file->e_shnum; i++)
+		{
+			reader->seek(reader, elf_file->sh64[elf_file->e_shstrndx].sh_offset + elf_file->sh64[i].sh_name_offset);
+			elf_file->sh64[i].sh_name = reader->get_rstring(reader);
+			if (elf_file->sh64[i].sh_name == NULL)
+				return (ft_dverbose(STDERR_FILENO, "Could not allocate memory"), -1);
+		}
+	}
+	else
+	{
+		ft_bverbose("No string table found\n");
+	}
+
+	size_t elf_section_data_size;
+	for (int i = 0; i < elf_file->e_shnum; i++)
+	{
+		if (elf_file->sh64[i].sh_type != SHT_NOBITS)
+		{
+			elf_section_data_size = elf_file->sh64[i].sh_size;
+
+			elf_file->sh64[i].data = malloc(elf_section_data_size);
+			if (elf_file->sh64[i].data == NULL)
+			{
+				return (ft_dverbose(STDERR_FILENO, "Could not allocate memory\n"), -1);
+			}
+
+			ft_memset(elf_file->sh64[i].data, 0, elf_section_data_size);
+			reader->seek(reader, elf_file->sh64[i].sh_offset);
+			reader->get_bytes(reader, elf_file->sh64[i].data, elf_section_data_size);
+		}
+	}
+
 	return 0;
 }
 
@@ -149,6 +185,41 @@ get_elf32_section_headers(t_elf32_file *elf_file, t_binary_reader *reader)
 	}
 
 	ft_bverbose("Section table contains %d entries\n", elf_file->e_shnum);
+
+	if (elf_file->e_shstrndx > 0)
+	{
+		ft_bverbose("String table found at index: %d\n", elf_file->e_shstrndx);
+		for (int i = 0; i < elf_file->e_shnum; i++)
+		{
+			reader->seek(reader, elf_file->sh32[elf_file->e_shstrndx].sh_offset + elf_file->sh32[i].sh_name_offset);
+			elf_file->sh32[i].sh_name = reader->get_rstring(reader);
+			if (elf_file->sh32[i].sh_name == NULL)
+				return (ft_dverbose(STDERR_FILENO, "Could not allocate memory"), -1);
+		}
+	}
+	else
+	{
+		ft_bverbose("No string table found\n");
+	}
+
+	size_t elf_section_data_size;
+	for (int i = 0; i < elf_file->e_shnum; i++)
+	{
+		if (elf_file->sh32[i].sh_type != SHT_NOBITS)
+		{
+			elf_section_data_size = elf_file->sh32[i].sh_size;
+
+			elf_file->sh32[i].data = malloc(elf_section_data_size);
+			if (elf_file->sh32[i].data == NULL)
+			{
+				return (ft_dverbose(STDERR_FILENO, "Could not allocate memory\n"), -1);
+			}
+
+			ft_memset(elf_file->sh32[i].data, 0, elf_section_data_size);
+			reader->seek(reader, elf_file->sh32[i].sh_offset);
+			reader->get_bytes(reader, elf_file->sh32[i].data, elf_section_data_size);
+		}
+	}
 	return 0;
 }
 

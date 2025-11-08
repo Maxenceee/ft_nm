@@ -716,18 +716,22 @@ print_sym(void *elf_file, int level)
 
 	sort_nodes(&nodes, level);
 
+	char *radix_dec = ELF_CLASS(elf_file) == ELF_64BITS ? "%016ld " : "%08ld ";
+	char *radix_oct = ELF_CLASS(elf_file) == ELF_64BITS ? "%016lo " : "%08lo ";
+	char *radix_hex = ELF_CLASS(elf_file) == ELF_64BITS ? "%016lx " : "%08lx ";
+
 	char printr[16];
 	switch (F_RADIX(level))
 	{
 	case F_RDX_DEC:
-		ft_strlcpy(printr, "%016ld ", sizeof(printr));
+		ft_strlcpy(printr, radix_dec, sizeof(printr));
 		break;
 	case F_RDX_OCT:
-		ft_strlcpy(printr, "%016lo ", sizeof(printr));
+		ft_strlcpy(printr, radix_oct, sizeof(printr));
 		break;
 	case F_RDX_HEX:
 	default:
-		ft_strlcpy(printr, "%016lx ", sizeof(printr));
+		ft_strlcpy(printr, radix_hex, sizeof(printr));
 		break;
 	}
 
@@ -736,7 +740,7 @@ print_sym(void *elf_file, int level)
 		if (node->has_ndx)
 			ft_verbose(printr, node->value);
 		else
-			ft_verbose("                 ");
+			ft_verbose(ELF_CLASS(elf_file) == ELF_64BITS ? "                 " : "         ");
 
 		ft_verbose("%c ", node->type);
 

@@ -433,7 +433,8 @@ print_type(int fd, const char *fmt, va_list *argp)
 	}
 }
 
-int ft_vdverbose(int fd, const char *fmt, va_list *ap)
+static int
+ft_vdverbose(int fd, const char *fmt, va_list *ap)
 {
 	verbose_size = 0;
 	print_type(fd, fmt, ap);
