@@ -53,7 +53,7 @@ nm(const char *filename, int option)
 		return (1);
 	}
 
-	t_elf_file *elf_file = new_elf_file(reader);
+	void *elf_file = new_elf_file(reader);
 	if (elf_file == NULL)
 	{
 		ft_dverbose(STDERR_FILENO, NM_PREFIX"The file was not recognized as a valid object file\n");
@@ -67,6 +67,7 @@ nm(const char *filename, int option)
 		ft_dverbose(STDERR_FILENO, NM_PREFIX"%s: no symbols\n", filename);
 		break;
 	case 1:
+
 		return (1);
 	}
 	return (0);

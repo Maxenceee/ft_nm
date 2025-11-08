@@ -245,6 +245,10 @@ enum
 #define ELF64_ST_TYPE(i)	((i)&0xf)
 #define ELF64_ST_INFO(b,t)	(((b)<<4)+((t)&0xf))
 
+#define ELF32_ST_BIND(i)	((i) >> 4)
+#define ELF32_ST_TYPE(i)	((i) & 0xf)
+#define ELF32_ST_INFO(b,t)	(((b) << 4) + ((t) & 0xf))
+
 enum
 {
 	STV_DEFAULT		= 0,
@@ -320,5 +324,8 @@ typedef struct {
 
 // Check endianness and swap bytes if needed
 #define MAGIC(x, e)	(e == LITTLE_ENDIAN ? x : ((x >> 24) & 0xff) | ((x >> 8) & 0xff00) | ((x << 8) & 0xff0000) | ((x << 24) & 0xff000000))
+
+#define ELF_CLASS(ptr) (((t_elf_ident *)ptr)->ei_class)
+#define ELF_SYM_VALUE(e, idx) ((e)->e_ident.ei_class == ELF_64BITS ? (e)->sym64[idx].st_value : (e)->sym32[idx].st_value)
 
 #endif /* ELF_H */

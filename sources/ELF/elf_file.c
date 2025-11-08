@@ -152,6 +152,69 @@ get_elf32_section_headers(t_elf32_file *elf_file, t_binary_reader *reader)
 	return 0;
 }
 
+static void
+delete_elf64_file(t_elf64_file *elf_file)
+{
+	if (elf_file == NULL)
+		return ;
+
+	if (elf_file->ph64)
+		free(elf_file->ph64);
+
+	if (elf_file->sh64)
+	{
+		for (int i = 0; i < elf_file->e_shnum; i++)
+		{
+			if (elf_file->sh64[i].sh_name)
+				free(elf_file->sh64[i].sh_name);
+			if (elf_file->sh64[i].data)
+				free(elf_file->sh64[i].data);
+		}
+		free(elf_file->sh64);
+	}
+
+	free(elf_file);
+}
+
+static void
+delete_elf32_file(t_elf32_file *elf_file)
+{
+	if (elf_file == NULL)
+		return ;
+
+	if (elf_file->ph32)
+		free(elf_file->ph32);
+
+	if (elf_file->sh32)
+	{
+		for (int i = 0; i < elf_file->e_shnum; i++)
+		{
+			if (elf_file->sh32[i].sh_name)
+				free(elf_file->sh32[i].sh_name);
+			if (elf_file->sh32[i].data)
+				free(elf_file->sh32[i].data);
+		}
+		free(elf_file->sh32);
+	}
+
+	free(elf_file);
+}
+
+void
+delete_elf_file(void* elf_file)
+{
+	t_elf_ident *ident = elf_file;
+	switch (ident->ei_class)
+	{
+	case ELF_64BITS:
+		delete_elf64_file((t_elf64_file*)elf_file);
+		break;
+	case ELF_32BITS:
+		delete_elf32_file((t_elf32_file*)elf_file);
+		break;
+	}
+}
+
 t_elf64_file*
 new_elf64_file(t_binary_reader *reader, t_elf_ident elf_file_ident)
 {
@@ -335,52 +398,4 @@ new_elf_file(t_binary_reader *reader)
 	{
 		return (new_elf32_file(reader, elf_file_ident));
 	}
-}
-
-void
-delete_elf64_file(t_elf64_file *elf_file)
-{
-	if (elf_file == NULL)
-		return ;
-
-	if (elf_file->ph64)
-		free(elf_file->ph64);
-
-	if (elf_file->sh64)
-	{
-		for (int i = 0; i < elf_file->e_shnum; i++)
-		{
-			if (elf_file->sh64[i].sh_name)
-				free(elf_file->sh64[i].sh_name);
-			if (elf_file->sh64[i].data)
-				free(elf_file->sh64[i].data);
-		}
-		free(elf_file->sh64);
-	}
-	
-	free(elf_file);
-}
-
-void
-delete_elf32_file(t_elf32_file *elf_file)
-{
-	if (elf_file == NULL)
-		return ;
-
-	if (elf_file->ph32)
-		free(elf_file->ph32);
-
-	if (elf_file->sh32)
-	{
-		for (int i = 0; i < elf_file->e_shnum; i++)
-		{
-			if (elf_file->sh32[i].sh_name)
-				free(elf_file->sh32[i].sh_name);
-			if (elf_file->sh32[i].data)
-				free(elf_file->sh32[i].data);
-		}
-		free(elf_file->sh32);
-	}
-	
-	free(elf_file);
 }

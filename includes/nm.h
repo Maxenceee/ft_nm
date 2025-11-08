@@ -70,8 +70,7 @@ typedef struct nm_sym_s
  * ELF
  */
 
- void		delete_elf64_file(t_elf64_file *elf_file);
-void		delete_elf32_file(t_elf32_file *elf_file);
+void		delete_elf_file(void *elf_file);
 void*		new_elf_file(t_binary_reader *reader);
 
 /**
