@@ -25,40 +25,79 @@ free_nodes(nm_sym_node_t *node)
 	}
 }
 
+int	ft_symcmp(const char *s1, const char *s2)
+{
+#ifdef __APPLE__
+	return ft_strcmp(s1, s2);
+#else
+	uint32_t	i = 0;
+	unsigned char	c1;
+	unsigned char	c2;
+
+	while (s1[i] != '\0' && s2[i] != '\0')
+	{
+		c1 = (unsigned char)s1[i];
+		c2 = (unsigned char)s2[i];
+
+		/* tolower for ASCII only */
+		if (c1 >= 'A' && c1 <= 'Z') c1 = c1 + 32;
+		if (c2 >= 'A' && c2 <= 'Z') c2 = c2 + 32;
+
+		if (c1 != c2)
+			return (int)c1 - (int)c2;
+		i++;
+	}
+
+	c1 = (unsigned char)s1[i];
+	c2 = (unsigned char)s2[i];
+
+	if (c1 >= 'A' && c1 <= 'Z') c1 = c1 + 32;
+	if (c2 >= 'A' && c2 <= 'Z') c2 = c2 + 32;
+
+	return (int)c1 - (int)c2;
+#endif /* __APPLE__ */
+}
+
 void
 build_full_name(char *dest, size_t dest_size, char *name, char *version)
 {
-	 size_t i = 0;
-    size_t j = 0;
+	size_t i = 0;
+	size_t j = 0;
 
-    // Copie name dans dest
-    while (name[i] && i + 1 < dest_size)
-	{
-        dest[i] = name[i];
-        i++;
-    }
+	if (dest_size == 0)
+		return;
 
-    // Si version existe et il reste de la place, ajoute '@'
-    if (version && i + 1 < dest_size)
-	{
-        dest[i] = '@';
-        i++;
-    }
+#ifdef __APPLE__
+	const char *src_name = name;
+#else
+	const char *src_name = name;
+	while ((*src_name == '_' || *src_name == '.') && src_name[1] != '\0')
+		src_name++;
+#endif /* __APPLE__ */
 
-    // Copie version dans dest après '@'
-    if (version)
+	while (src_name[i] && i + 1 < dest_size)
 	{
-        while (version[j] && i + 1 < dest_size)
+		dest[i] = src_name[i];
+		i++;
+	}
+
+	if (version && i + 1 < dest_size)
+	{
+		dest[i] = '@';
+		i++;
+	}
+
+	if (version)
+	{
+		while (version[j] && i + 1 < dest_size)
 		{
-            dest[i] = version[j];
-            i++;
-            j++;
-        }
-    }
+			dest[i] = version[j];
+			i++;
+			j++;
+		}
+	}
 
-    // Termine toujours par un '\0'
-    if (dest_size > 0)
-        dest[i] = '\0';
+	dest[i] = '\0';
 }
 
 static int
@@ -90,7 +129,7 @@ cmp_sym_name(const nm_sym_node_t *a, const nm_sym_node_t *b)
 	build_full_name(full_name_a, sizeof(full_name_a), a->name, a->version);
 	build_full_name(full_name_b, sizeof(full_name_b), b->name, b->version);
 
-	int res = ft_strcmp(full_name_a, full_name_b);
+	int res = ft_symcmp(full_name_a, full_name_b);
 	if (res == 0)
 	{
 		return cmp_diff(a->value, b->value);
