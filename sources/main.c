@@ -28,7 +28,9 @@ static void	usage(void)
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-U", "--defined-only", "Show only defined symbols");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-u", "--undefined-only", "Show only undefined symbols");
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-v", "--version", "Display the version");
+#ifdef __APPLE__
 	(void)ft_dverbose(STDERR_FILENO, "  %s, %-20s %s\n", "-W", "--no-weak", "Show only non-weak symbols");
+#endif /* __APPLE__ */
 }
 
 int
@@ -50,7 +52,9 @@ main(int ac, char** av)
 		{"defined-only", 'U', OPTPARSE_NONE},
 		{"undefined-only", 'u', OPTPARSE_NONE},
 		{"version", 'v', OPTPARSE_NONE},
+#ifdef __APPLE__
 		{"no-weak", 'W', OPTPARSE_NONE},
+#endif /* __APPLE__ */
 		{0}
 	};
 	struct getopt_s options;
@@ -76,9 +80,11 @@ main(int ac, char** av)
 				option |= F_DFNO;
 #endif /* __APPLE__ */
 				break;
+#ifdef __APPLE__
 			case 'W':
 				option |= F_NWKS;
 				break;
+#endif /* __APPLE__ */
 			case 'r':
 				option |= F_RSRT;
 				break;
