@@ -33,15 +33,21 @@ char	*br_get_rstring(t_binary_reader *this)
 	uint8_t	*res;
 	int		i = 0;
 
-	res = ft_calloc(1, sizeof(char));
+	size_t curr = this->tell(this);
+	while (this->get_uint8(this) != 0)
+		i++;
+
+	res = ft_calloc(i + 1, sizeof(char));
 	if (!res)
 		return (NULL);
+
+	i = 0;
+	(void)this->seek(this, curr);
 	while ((c = this->get_uint8(this)) != 0)
 	{
-		res = ft_memjoin(res, &c, i, 1);
-		if (!res)
-			return (NULL);
+		res[i] = c;
 		i++;
 	}
-	return ((char *)ft_memjoin(res, (uint8_t *)"\0", i, 1));
+
+	return ((char *)res);
 }

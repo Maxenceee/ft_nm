@@ -14,7 +14,7 @@
 
 int	ft_strcmp(const char *s1, const char *s2)
 {
-	uint32_t	i;
+	size_t	i;
 
 	i = 0;
 	while ((char)s1[i] == (char)s2[i] \
@@ -25,9 +25,9 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-int	ft_strncmp(const char *s1, const char *s2, uint32_t n)
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
-	uint32_t	i;
+	size_t	i;
 
 	i = 0;
 	if (n == 0)
@@ -40,9 +40,9 @@ int	ft_strncmp(const char *s1, const char *s2, uint32_t n)
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-int	ft_strnrcmp(const char *s1, const char *s2, uint32_t n)
+int	ft_strnrcmp(const char *s1, const char *s2, size_t n)
 {
-	uint32_t	i;
+	size_t	i;
 
 	i = ft_max(ft_strlen(s1), ft_strlen(s2)) - 1;
 	while (n > 0 && i > 0 && (char)s1[i] == (char)s2[n - 1])

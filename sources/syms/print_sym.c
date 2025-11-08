@@ -253,6 +253,8 @@ get_symbol_indexes64(t_elf64_file *elf_file, int level, int *symtab, int *symstr
 			else if (ft_strcmp(elf_file->sh64[i].sh_name, ".dynstr") == 0 && elf_file->sh64[i].sh_type == SHT_STRTAB)
 				*symstr = i;
 		}
+
+		ft_bverbose("Debug symbol table found and contains %u entries\n", elf_file->sh64[*symtab].sh_size / sizeof(t_elf64_sym));
 	}
 	else
 	{
@@ -263,9 +265,9 @@ get_symbol_indexes64(t_elf64_file *elf_file, int level, int *symtab, int *symstr
 			else if (ft_strcmp(elf_file->sh64[i].sh_name, ".strtab") == 0 && elf_file->sh64[i].sh_type == SHT_STRTAB)
 				*symstr = i;
 		}
-	}
 
-	ft_bverbose("Symbol table found and contains %u entries\n", elf_file->sh64[*symtab].sh_size / sizeof(t_elf64_sym));
+		ft_bverbose("Symbol table found and contains %u entries\n", elf_file->sh64[*symtab].sh_size / sizeof(t_elf64_sym));
+	}
 
 	if (elf_file->sh64[*symtab].sh_size == 0 || elf_file->sh64[*symtab].sh_type == SHT_NOBITS)
 		return (1);
@@ -285,6 +287,8 @@ get_symbol_indexes32(t_elf32_file *elf_file, int level, int *symtab, int *symstr
 			else if (ft_strcmp(elf_file->sh32[i].sh_name, ".dynstr") == 0 && elf_file->sh32[i].sh_type == SHT_STRTAB)
 				*symstr = i;
 		}
+
+		ft_bverbose("Debug symbol table found and contains %u entries\n", elf_file->sh32[*symtab].sh_size / sizeof(t_elf32_sym));
 	}
 	else
 	{
@@ -295,9 +299,9 @@ get_symbol_indexes32(t_elf32_file *elf_file, int level, int *symtab, int *symstr
 			else if (ft_strcmp(elf_file->sh32[i].sh_name, ".strtab") == 0 && elf_file->sh32[i].sh_type == SHT_STRTAB)
 				*symstr = i;
 		}
-	}
 
-	ft_bverbose("Symbol table found and contains %u entries\n", elf_file->sh32[*symtab].sh_size / sizeof(t_elf32_sym));
+		ft_bverbose("Symbol table found and contains %u entries\n", elf_file->sh32[*symtab].sh_size / sizeof(t_elf32_sym));
+	}
 
 	if (elf_file->sh32[*symtab].sh_size == 0 || elf_file->sh32[*symtab].sh_type == SHT_NOBITS)
 		return (1);

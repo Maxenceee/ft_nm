@@ -2,16 +2,12 @@
 echo -e "${YELLOW}Starting ft_nm vs nm comparison tests...${NC}"
 
 BIN=(
-	# "btc"
 	"marvin_game"
-	# "rpn"
-	# "taskmasterd"
-	"woody"
 	"famine"
-	# "PmergeMe"
-	# "target"
-	# "webserv"
-	"woody_woodpacker"
+	"ls"
+	"target"
+	"cat"
+	"ssh"
 )
 FLAGS=(
 	""
@@ -21,12 +17,12 @@ FLAGS=(
 	"-D"
 	"-r"
 	"-p"
-	# "-U"
+	# "-U" # Macos only
 	"-n"
 	"-to"
 	"-tx"
 	"-td"
-	# "-W"
+	# "-W" # Macos only
 )
 
 OUTDIR=test_res

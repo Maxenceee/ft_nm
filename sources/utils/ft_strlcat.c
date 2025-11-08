@@ -12,7 +12,7 @@
 
 #include "utils.h"
 
-uint32_t	ft_strlcat(char *dest, const char *src, uint32_t size)
+size_t	ft_strlcat(char *dest, const char *src, size_t size)
 {
 	char	*d;
 	const char	*s;
@@ -27,7 +27,7 @@ uint32_t	ft_strlcat(char *dest, const char *src, uint32_t size)
 	dlen = d - dest;
 	n = size - dlen;
 	if (n == 0)
-		return (dlen + (uint32_t)ft_strlen(s));
+		return (dlen + ft_strlen(s));
 	while (*s != '\0')
 	{
 		if (n != 1)

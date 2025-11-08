@@ -12,9 +12,9 @@
 
 #include "utils.h"
 
-uint32_t	ft_strlcpy(char *dest, const char *src, uint32_t size)
+size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 {
-	uint32_t	i;
+	size_t	i;
 
 	if (!dest || !src)
 		return (0);

@@ -23,13 +23,3 @@ size_t	ft_strlen(const char *str)
 		count++;
 	return (count);
 }
-
-int	ft_tablen(char **str)
-{
-	int	count;
-
-	count = -1;
-	while (str[++count])
-		;
-	return (count);
-}
