@@ -14,6 +14,7 @@
 # define FT_NM_H
 
 #include <limits.h>
+#include <ctype.h>
 
 #include "elf.h"
 #include "verbose.h"
@@ -42,6 +43,7 @@
 #define F_RSRT		0x00001000
 #define F_NSRT		0x00002000
 #define F_ASRT		0x00004000
+#define REMOVE_SORT_FLAGS(x, f)   ((x) &= ~(f))
 
 #define F_RDX_DEC	0X01000000
 #define F_RDX_HEX	0x02000000

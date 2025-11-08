@@ -25,79 +25,49 @@ free_nodes(nm_sym_node_t *node)
 	}
 }
 
-int	ft_symcmp(const char *s1, const char *s2)
+int
+ft_symcmp(const nm_sym_node_t *a, const nm_sym_node_t *b)
 {
-#ifdef __APPLE__
-	return ft_strcmp(s1, s2);
-#else
-	uint32_t	i = 0;
-	unsigned char	c1;
-	unsigned char	c2;
+#ifndef __APPLE__
+	int i;
+	int j;
+	char s1_c;
+	char s2_c;
+	char *s1 = a->name;
+	char *s2 = b->name;
 
-	while (s1[i] != '\0' && s2[i] != '\0')
+	i = 0;
+	j = 0;
+	if (!s1 || !s2)
+		return (0);
+
+	while (*s1 == '_' || *s1 == '.')
+		s1++;
+	while (*s2 == '_' || *s2 == '.')
+		s2++;
+	while (s1[i] || s2[j])
 	{
-		c1 = (unsigned char)s1[i];
-		c2 = (unsigned char)s2[i];
-
-		/* tolower for ASCII only */
-		if (c1 >= 'A' && c1 <= 'Z') c1 = c1 + 32;
-		if (c2 >= 'A' && c2 <= 'Z') c2 = c2 + 32;
-
-		if (c1 != c2)
-			return (int)c1 - (int)c2;
-		i++;
-	}
-
-	c1 = (unsigned char)s1[i];
-	c2 = (unsigned char)s2[i];
-
-	if (c1 >= 'A' && c1 <= 'Z') c1 = c1 + 32;
-	if (c2 >= 'A' && c2 <= 'Z') c2 = c2 + 32;
-
-	return (int)c1 - (int)c2;
-#endif /* __APPLE__ */
-}
-
-void
-build_full_name(char *dest, size_t dest_size, char *name, char *version)
-{
-	size_t i = 0;
-	size_t j = 0;
-
-	if (dest_size == 0)
-		return;
-
-#ifdef __APPLE__
-	const char *src_name = name;
-#else
-	const char *src_name = name;
-	while ((*src_name == '_' || *src_name == '.') && src_name[1] != '\0')
-		src_name++;
-#endif /* __APPLE__ */
-
-	while (src_name[i] && i + 1 < dest_size)
-	{
-		dest[i] = src_name[i];
-		i++;
-	}
-
-	if (version && i + 1 < dest_size)
-	{
-		dest[i] = '@';
-		i++;
-	}
-
-	if (version)
-	{
-		while (version[j] && i + 1 < dest_size)
-		{
-			dest[i] = version[j];
+		while (s1[i] && (s1[i] == '_' || s1[i] == '@' || s1[i] == '.'))
 			i++;
+		while (s2[j] && (s2[j] == '_' || s2[j] == '@' || s2[j] == '.'))
 			j++;
-		}
+		s1_c = ft_tolower(s1[i]);
+		s2_c = ft_tolower(s2[j]);
+		if (s1_c < s2_c)
+			return (s1_c - s2_c);
+		if (s1_c > s2_c)
+			return (s1_c - s2_c);
+		i++;
+		j++;
 	}
 
-	dest[i] = '\0';
+	if (a->value == b->value)
+		return ft_strcmp(a->name, b->name);
+	return ft_strcmp(b->name, a->name);
+
+#else
+	return ft_strcmp(s1, s2);
+#endif
 }
 
 static int
@@ -123,13 +93,7 @@ cmp_sym_num(const nm_sym_node_t *a, const nm_sym_node_t *b)
 static int
 cmp_sym_name(const nm_sym_node_t *a, const nm_sym_node_t *b)
 {
-	char full_name_a[1024];
-	char full_name_b[1024];
-
-	build_full_name(full_name_a, sizeof(full_name_a), a->name, a->version);
-	build_full_name(full_name_b, sizeof(full_name_b), b->name, b->version);
-
-	int res = ft_symcmp(full_name_a, full_name_b);
+	int res = ft_symcmp(a, b);
 	if (res == 0)
 	{
 		return cmp_diff(a->value, b->value);

@@ -72,7 +72,9 @@ main(int ac, char** av)
 				option |= F_UNDO;
 				break;
 			case 'U':
+#ifdef __APPLE__
 				option |= F_DFNO;
+#endif /* __APPLE__ */
 				break;
 			case 'W':
 				option |= F_NWKS;
@@ -81,9 +83,15 @@ main(int ac, char** av)
 				option |= F_RSRT;
 				break;
 			case 'p':
+#ifndef __APPLE__
+				REMOVE_SORT_FLAGS(option, F_NSRT);
+#endif /* __APPLE__ */
 				option |= F_NSRT;
 				break;
 			case 'n':
+#ifndef __APPLE__
+				REMOVE_SORT_FLAGS(option, F_NSRT);
+#endif /* __APPLE__ */
 				option |= F_ASRT;
 				break;
 			case 'D':
