@@ -2,6 +2,8 @@
 
 My nm projet for the 42 School cursus. The project nm (name mangling) is a tool that can be used to list symbols from object files.
 
+Final grade : `125/100` & `Outstanding Project`
+
 ## Getting started
 
 You need to compile the project with `make`.
